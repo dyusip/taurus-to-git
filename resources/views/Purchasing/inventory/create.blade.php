@@ -173,20 +173,20 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach($inventories as $inventory)
+                                        {{--@foreach($inventories as $inventory)
                                             <tr>
                                                 <td>{{ $inventory->code }}</td>
                                                 <td>{{ $inventory->name }}</td>
                                                 <td>{{ $inventory->desc }}</td>
                                                 <td>{{ $inventory->uom }}</td>
-                                                {{--<td>{{ $inventory->pqty }}</td>--}}
+                                                --}}{{--<td>{{ $inventory->pqty }}</td>--}}{{--
                                                 <td class="text-center">{{ $inventory->status }}</td>
                                                 <td class="text-center">
                                                     <a href="#" class="text-success" id="btn-edit"  data-id="{{ $inventory->id }}"><i class="fa fa-edit"></i></a>
                                                     <a href="#modal-br-status" class="text-danger" id="btn-delete" data-id="{{ $inventory->id }}" data-toggle="modal"><i class="fa fa-remove"></i></a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach--}}
                                         </tbody>
 
                                     </table>
@@ -352,12 +352,12 @@
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script>
     $(document).ready(function() {
-        $('#dataTables-example').DataTable({
+        /*$('#dataTables-example').DataTable({
             dom: '<"html5buttons"B>lTfgitp',
             "bSort" : true,
             buttons: [
-                /* {extend: 'copy'},
-                 {extend: 'csv'},*/
+                /!* {extend: 'copy'},
+                 {extend: 'csv'},*!/
                 {extend: 'excel', title: 'Employee Account'},
                 {extend: 'pdf', title: 'Employee Account'},
 
@@ -373,6 +373,27 @@
                     }
                 }
             ]
+        });*/
+        $('#dataTables-example').DataTable({
+            'processing': true,
+            'serverSide': true,
+            'ajax': 'show',
+            'columns': [
+                {data: 1, name: 'code'},
+                {data: 2, name: 'name'},
+                {data: 3, name: 'desc'},
+                {data: 4, name: 'uom'},
+                {data: 6, name: 'status'},
+                {data: 9, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
+            ]
+            /* "columns": [
+             { "data": 1 },
+             { "data": 9 },
+             { "data": 3 },
+             { "data": 4 },
+             { "data": 2 },
+             { "data": 14 },
+             ]*/
         });
         $(document).on('click','#btn-edit',function () {
             var id = $(this).data('id');

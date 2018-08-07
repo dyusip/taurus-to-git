@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Inventory;
 use App\Branch;
+use Illuminate\Support\HtmlString;
+use Yajra\Datatables\Datatables;
 
 class InventoryController extends Controller
 {
@@ -34,8 +36,8 @@ class InventoryController extends Controller
             $num = Inventory::max('code');
             ++$num;
         }
-        $inventories = Inventory::all();
-        return view('Purchasing.inventory.create',compact('num','inventories'));
+        //$inventories = Inventory::all();
+        return view('Purchasing.inventory.create',compact('num'));
     }
 
     /**
@@ -60,6 +62,12 @@ class InventoryController extends Controller
     public function show($id)
     {
         //
+        $inventories = Inventory::where(['status' => 'AC'])->select('*');
+
+        return Datatables::of($inventories) ->addColumn('action', function ($inventories) {
+            return new HtmlString('<a href="#" class="text-success" id="btn-edit"  data-id='.$inventories->id.'><i class="fa fa-edit"></i></a>
+                                                    <a href="#modal-br-status" class="text-danger" id="btn-delete" data-id='.$inventories->id.' data-toggle="modal"><i class="fa fa-remove"></i></a>');
+        })->make();
     }
 
     /**

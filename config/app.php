@@ -164,6 +164,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
         Codedge\Fpdf\FpdfServiceProvider::class, // [1]
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -229,6 +230,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
         'Fpdf' => Codedge\Fpdf\Facades\Fpdf::class, // [2]
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
     ],
 

@@ -48,6 +48,13 @@
             <li>
                 <a href="{{ url('/transfer/create') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transfer Item</span> </a>
             </li>
+            <li>
+                <a href="javascript:;"><i class="fa fa-cloud-upload"></i> <span class="nav-label">Import</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li><a href="{{ url('/import/create') }}">Item</a></li>
+                    <li><a href="{{ url('/import/create/branch') }}">Branch Item</a></li>
+                </ul>
+            </li>
             {{--<li>
                 <a href="javascript:;"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales Order</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">

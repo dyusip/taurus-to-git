@@ -57,6 +57,11 @@ Route::group(['middleware'=>'authenticated'], function (){
     Route::get('/transfer/{id}/{code}','TransferController@item_data');
     Route::post('/transfer','TransferController@store');
 
+    Route::get('/import/create','ImportInventoryController@index');
+    Route::post('/import','ImportInventoryController@import');
+    Route::get('/import/create/branch','ImportInventoryController@branch_index');
+    Route::post('/import/branch','ImportInventoryController@branch_import');
+
     //Management
     Route::get('/notification/po','NotificationController@po_index');
     Route::get('/notification/transfer','NotificationController@tf_index');
