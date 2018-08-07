@@ -72,8 +72,8 @@
                                 <div class="ibox-content">
                                     <div class="row">
                                         <div class="col-sm-7 b-r">
-                                            <div class="form-group"><label>Job Order #</label><input type="text" name="jo_code" style="text-transform: uppercase" id="jo_code" placeholder="Job Order #" class="form-control"></div>
-                                            <div class="form-group"><label>Customer Name</label> <input type="text" style="text-transform: uppercase" name="cust_name" id="cust_name" placeholder="Customer Name" class="form-control"></div>
+                                            <div class="form-group"><label>Job Order #</label><input type="text" required name="jo_code" style="text-transform: uppercase" id="jo_code" placeholder="Job Order #" class="form-control"></div>
+                                            <div class="form-group"><label>Customer Name</label> <input type="text" required style="text-transform: uppercase" name="cust_name" id="cust_name" placeholder="Customer Name" class="form-control"></div>
                                             <div class="form-group"><label>Address</label> <input type="text" name="cust_address" style="text-transform: uppercase" id="cust_add" placeholder="Address" class="form-control"></div>
                                             <div class="form-group"><label>Contact #</label> <input type="text" name="cust_contact" style="text-transform: uppercase" id="cust_contact" placeholder="Contact #" class="form-control"></div>
                                             <div class="form-group">
@@ -81,7 +81,7 @@
                                                 <select id="so_salesman" required name="so_salesman" class="form-control">
                                                     <option value=""></option>
                                                     @foreach($salesmans as $salesman)
-                                                        <option value="{{ $salesman->code }}">{{ $salesman->name }}</option>
+                                                        <option value="{{ $salesman->username }}">{{ $salesman->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -173,7 +173,7 @@
                                         <table class="table table-striped table-bordered table-hover" id="dataTables-salesOrder" data-page-size="15">
                                             <thead>
                                             <tr>
-                                                <th width="9%">Code</th>
+                                                <th width="10%">Code</th>
                                                 <th data-hide="phone" width="23%">Name</th>
                                                 <th data-hide="phone" width="5%">UOM</th>
                                                 <th data-hide="phone" width="5%">Available</th>
@@ -188,14 +188,16 @@
                                             <tr>
                                                 <td>
                                                     <input type="text" required name="prod_code[]" id="code" class="form-control code" readonly>
-                                                    <input type="hidden" required name="prod_name[]" id="prod_name" class="form-control" readonly>
+
                                                 </td>
                                                 <td><select class="form-control select2_demo_1" required tabindex="2" name="product" id="product">
                                                         <option></option>
                                                         @foreach($inventories as $inventory)
                                                             <option value="{{ $inventory->inventory->code }}"> {{ $inventory->inventory->name }}</option>
                                                         @endforeach
-                                                    </select></td>
+                                                    </select>
+                                                    <input type="hidden" required name="prod_name[]" id="prod_name" class="form-control" readonly>
+                                                </td>
                                                 <td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td>
                                                 <td><input type="text" id="available" readonly class="form-control qty" ></td>
                                                 <td><input type="text" name="qty[]" id="qty" required class="form-control qty" ></td>
@@ -450,5 +452,19 @@
         $('.tooltip').hide();
         totalAmount();
     });
+
+    $(function () {
+        $('#datepicker').datepicker();
+    });
+    $('#reqDate').change(function () {
+        ($(this).val() != "") ? $('#reqDate-error').hide() : $('#reqDate-error').show();
+        ($(this).val() != "") ? $('#reqDate').removeClass('error') : $('#reqDate').addClass('error');
+    });
+
+    @if (session('status'))
+        $(document).ready(function () {
+        toastr.success("{{ session('status') }}");
+    });
+    @endif
 </script>
 @endpush

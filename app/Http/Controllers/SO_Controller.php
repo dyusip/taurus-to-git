@@ -7,6 +7,7 @@ use App\SoHeader;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SO_Controller extends Controller
 {
@@ -49,7 +50,25 @@ class SO_Controller extends Controller
     public function store(Request $request)
     {
         //
-        return $request->all();
+        $this->validate($request, [
+            'so_code' => 'required|string|unique:so_headers',
+        ],['The so code has already been taken. Please refresh the page']);
+        $create = SoHeader::create($request->all());
+        foreach ($request->prod_code as $item => $value){
+            $create->so_detail()->create([
+                'sod_code' => $request->so_code,
+                'sod_prod_code' => $request->prod_code[$item],
+                'sod_prod_name' => $request->prod_name[$item],
+                'sod_prod_uom' => $request->uom[$item],
+                'sod_prod_qty' => $request->qty[$item],
+                'sod_prod_price' => $request->price[$item],
+                'sod_less' => $request->less[$item],
+                'sod_prod_amount' => $request->amount[$item],
+            ]);
+            $inventory = Branch_Inventory::where(['prod_code'=> $request->prod_code[$item], 'branch_code'=>$request->branch_code]);
+            $inventory->update(['quantity'=> DB::raw('quantity - '.$request->qty[$item])]);
+        }
+        return redirect('/so/create')->with('status', "SO# ".strtoupper($request->so_code)." successfully created.");
     }
 
     /**

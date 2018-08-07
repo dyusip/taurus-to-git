@@ -25,8 +25,8 @@ class CreateSoHeadersTable extends Migration
             $table->string('cust_add','25')->nullable();
             $table->string('cust_contact','25')->nullable();
             $table->date('so_date');
-            $table->double('serv_charge')->default(0);
-            $table->double('amount_rec')->default(0);
+            $table->double('serv_charge')->nullable();
+            $table->double('amount_rec')->nullable();
             $table->double('so_amount');
             $table->char('so_status','2')->default('PD');
 

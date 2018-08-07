@@ -21,7 +21,7 @@ class CreateSoDetailsTable extends Migration
             $table->string('sod_prod_uom','25');
             $table->integer('sod_prod_qty');
             $table->double('sod_prod_price');
-            $table->string('sod_less','3')->default('0%');
+            $table->integer('sod_less');
             $table->double('sod_prod_amount');
             $table->timestamps();
             $table->primary(['sod_code','sod_prod_code']);
