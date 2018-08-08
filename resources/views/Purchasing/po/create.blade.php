@@ -181,7 +181,7 @@
                                             <th data-hide="phone" width="6%">Qty</th>
                                             <th data-hide="phone,tablet" width="8%">Price</th>
                                             <th class="text-center" width="8%">Amount</th>
-                                            <th class="text-center tooltip-demo" width="5%"><a id="add-row" data-toggle="tooltip" title="Add more item"><i class="fa fa-plus-circle"></i></a></th>
+                                            <th class="text-center tooltip-demo" width="5%"><span data-toggle="tooltip" title="Add more item"><a href="#myModal" data-toggle="modal" ><i class="fa fa-plus-circle"></i></a></span></th>
                                         </tr>
                                         </thead>
                                         <tbody id="order-tbl" class="tooltip-demo">
@@ -203,6 +203,17 @@
                                             <td class="text-center"><a class="text-danger"><i class="fa fa-remove"></i></a></td>
                                         </tr>
                                         </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <th width="9%">Code</th>
+                                            <th data-hide="phone" width="23%">Name</th>
+                                            <th data-hide="phone" width="5%">UOM</th>
+                                            <th data-hide="phone" width="6%">Qty</th>
+                                            <th data-hide="phone,tablet" width="8%">Price</th>
+                                            <th class="text-center" width="8%">Amount</th>
+                                            <th class="text-center tooltip-demo" width="5%"><span data-toggle="tooltip" title="Add more item"><a href="#myModal" data-toggle="modal" ><i class="fa fa-plus-circle"></i></a></span></th>
+                                        </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                                 <div class="row">
@@ -232,7 +243,27 @@
             </form>
         </div>
         <!-- modal-->
-    <!-- /#page-wrapper -->
+        <div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content animated bounceInRight">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <i class="fa fa-laptop modal-icon"></i>
+                        <h4 class="modal-title">Add Item</h4>
+                        <small class="font-bold">Number of items to be added.</small>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group"><label>Number of items</label> <input type="text" id="count" placeholder="Enter number of items" class="form-control"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                        <button type="button" id="add-count" class="btn btn-primary">Add Items</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- /#page-wrapper -->
         <div class="footer">
             <div class="pull-right">
                 <strong></strong>
@@ -259,6 +290,22 @@
 <script>
     $(document).ready(function () {
         Choosen();
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "progressBar": true,
+            "preventDuplicates": true,
+            "positionClass": "toast-top-right",
+            "onclick": null,
+            "showDuration": "400",
+            "hideDuration": "1000",
+            "timeOut": "7000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
     });
     function Choosen() {
         $(".select2_demo_1").select2();
@@ -303,6 +350,7 @@
     $(document).ready(function(){
         $('[id^=quantity]').keypress(validateNumber);
         $('[id^=quantity_edit]').keypress(validateNumber);
+        $('[id^=count]').keypress(validateNumber);
         Validate();
     });
     function Validate() {
@@ -403,11 +451,30 @@
             tr.find('#amount').val(amount);
             totalAmount();
         });
-        $('#add-row').on('click',function () {
-            addRow();
-            Choosen();
-            Validate();
+        /*$('.add-row').on('click',function () {
+            var tr = $('tbody tr').length;
+            if(tr < 5){
+                addRow();
+                Choosen();
+                Validate();
+            }else{
+                toastr.error("Item exceeds the limit.");
+            }
+        });*/
+        $('#add-count').on('click',function () {
+            var tr = $('tbody tr').length;
+            var count = $('#count').val();
+            if(tr < 101 && (parseInt(tr) + parseInt(count)) < 101){
+                addRow();
+                Choosen();
+                Validate();
+                $('#myModal').modal('hide');
+                count = $('#count').val('');
+            }else{
+                toastr.error("Item exceeds the limit.");
+            }
         });
+
         function totalAmount() {
             var total = 0;//totalAmount
             $('.amount').each(function (i,e) {
@@ -417,24 +484,27 @@
             $('#totalAmount').val(total)
         }
         function addRow() {
-            var row = "<tr> " +
-                "<td>" +
-                "<input type='text' name='prod_code[]' id='code' class='form-control code' readonly>" +
-                "<input type='hidden' name='prod_name[]' id='prod_name' class='form-control' readonly> " +
-                "</td> " +
-            "<td><select class='form-control select2_demo_1' required tabindex='2' name='product' id='product'> " +
-            "<option></option>"+
-                '@foreach($inventories as $inventory)'+
-                '<option value="{{ $inventory->inventory->code }}"> {{ $inventory->inventory->name }}</option>'+
-                '@endforeach' +
-                    '</select></td> ' +
-                    '<td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td> ' +
-                    '<td><input type="text" name="qty[]" required id="qty" class="form-control qty" ></td> ' +
-                    '<td><input type="text" name="cost[]" id="cost" class="form-control" readonly></td> ' +
-                    '<td><input type="text" name="amount[]" id="amount" class="form-control amount" readonly></td> ' +
-                '<td class="text-center tooltip-demo"><a id="remove-row" class="text-danger" data-toggle="tooltip" title="Remove item"><i class="fa fa-remove"></i></a></td> ' +
-                '</tr>';
-                $('tbody').append(row);
+            var count = $('#count').val();
+            for (var i = 0; i < count; i++) {
+                var row = "<tr> " +
+                    "<td>" +
+                    "<input type='text' name='prod_code[]' id='code' class='form-control code' readonly>" +
+                    "<input type='hidden' name='prod_name[]' id='prod_name' class='form-control' readonly> " +
+                    "</td> " +
+                "<td><select class='form-control select2_demo_1' required tabindex='2' name='product' id='product'> " +
+                "<option></option>"+
+                    '@foreach($inventories as $inventory)'+
+                    '<option value="{{ $inventory->inventory->code }}"> {{ $inventory->inventory->name }}</option>'+
+                    '@endforeach' +
+                        '</select></td> ' +
+                        '<td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td> ' +
+                        '<td><input type="text" name="qty[]" required id="qty" class="form-control qty" ></td> ' +
+                        '<td><input type="text" name="cost[]" id="cost" class="form-control" readonly></td> ' +
+                        '<td><input type="text" name="amount[]" id="amount" class="form-control amount" readonly></td> ' +
+                    '<td class="text-center tooltip-demo"><a id="remove-row" class="text-danger" data-toggle="tooltip" title="Remove item"><i class="fa fa-remove"></i></a></td> ' +
+                    '</tr>';
+                    $('tbody').append(row);
+            }
         }
         //$('#remove-row').on('click',function () {
         $('body').delegate('#remove-row','click',function () {

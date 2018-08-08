@@ -86,7 +86,7 @@
                                             </p>-->
 
                                             <!--<div class="hr-line-dashed"></div>-->
-                                            <form id="form_change_pass" method="post" action="saving/update_profile">
+                                            <form id="" method="post" action="saving/update_profile">
                                                 <div class="ibox-content">
                                                     <div class="alert alert-success" hidden>
                                                     </div>

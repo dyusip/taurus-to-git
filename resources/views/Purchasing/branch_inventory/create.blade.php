@@ -106,7 +106,7 @@
                                         <div class="col-md-12">
                                             <div class="form-group {{ $errors->has('branch_code') ? ' has-error' : '' }}">
                                                 <label>From</label>
-                                                <select class="form-control" name="branch_code" id="branch_code" required>
+                                                <select class="form-control" name="branch_code" id="_branch_code" required>
                                                     <option></option>
                                                     @foreach($branches as $branch)
                                                         <option value="{{ $branch->code }}" {{ (old("branch_code") == $branch->code ? "selected":"") }}>{{ $branch->name }}</option>
@@ -491,10 +491,12 @@
         $(document).on('click','#replicate-item', function () {
             $('#form-replicate').show();
             $('#form-inventory').hide();
+            $("#branch_code, #prod_code").removeAttr("readonly");
         });
         $(document).on('click','#add-item-main', function () {
             $('#form-replicate').hide();
             $('#form-inventory').show();
+            $("#branch_code, #prod_code").removeAttr("readonly");
         });
         $(document).ready(function () {
             @if($errors->has('branch_to') || session('status_'))
