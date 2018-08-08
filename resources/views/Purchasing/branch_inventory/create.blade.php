@@ -41,7 +41,7 @@
                                             <div class="form-group {{ $errors->has('branch_code') ? ' has-error' : '' }}">
                                                 <label>Branch</label>
                                                 <select class="form-control select2_demo_1" name="branch_code" id="branch_code" required>
-                                                    <option></option>
+                                                    <option value="">Select Branch</option>
                                                     @foreach($branches as $branch)
                                                         <option value="{{ $branch->code }}" {{ (old("branch_code") == $branch->code ? "selected":"") }}>{{ $branch->name }}</option>
                                                     @endforeach
@@ -55,7 +55,7 @@
                                             <div class="form-group {{ $errors->has('prod_code') ? ' has-error' : '' }}">
                                                 <label>Product Name</label>
                                                 <select class="form-control select2_demo_1" name="prod_code" id="prod_code" required>
-                                                    <option></option>
+                                                    <option value="">Select Product</option>
                                                     @foreach($products as $product)
                                                         <option value="{{ $product->code }}" {{ (old("prod_code") == $product->code ? "selected":"") }}>{{ $product->name }}</option>
                                                     @endforeach
@@ -356,6 +356,23 @@
             transform: rotate(360deg);
         }
     }
+
+    /*Readonly*/
+    select[readonly].select2-hidden-accessible + .select2-container {
+        pointer-events: none;
+        touch-action: none;
+    }
+
+    select[readonly].select2-hidden-accessible + .select2-container .select2-selection {
+        background: #eee;
+        box-shadow: none;
+    }
+
+    select[readonly].select2-hidden-accessible + .select2-container .select2-selection__arrow,
+    select[readonly].select2-hidden-accessible + .select2-container .select2-selection__clear {
+        display: none;
+    }
+
 </style>
 @endpush
 @push('scripts')
@@ -428,19 +445,20 @@
         $(document).on('click','#btn-edit',function () {
             $('#form-replicate').hide();
             $('#form-inventory').show();
-
             var id = $(this).data('id');
             var prod_code = $(this).data('prod');
             var branch_code = $(this).data('branch');
             $(".overlay").show();
             $.get(id+"/edit",{ product: prod_code, branch: branch_code } ).done( function (data) {
                 $('.overlay').fadeOut();
-                $('#branch_code').css({'pointer-events': 'none','background-color': '#eee','opacity':1});//background-color: #eee; opacity: 1
-                $('#branch_code').val(data.branch_code);
-                $('#prod_code').css({'pointer-events': 'none','background-color': '#eee','opacity':1});
+                //$('#branch_code').css({'pointer-events': 'none','background-color': '#eee','opacity':1});//background-color: #eee; opacity: 1
+                $("#branch_code").select2().select2('val',data.branch_code);
+                $("#branch_code, #prod_code").attr("readonly", "readonly");
+                //$('#prod_code').css({'pointer-events': 'none','background-color': '#eee','opacity':1});
                 //$('#prod_code option:not(:selected)').attr('disabled',true);
                 $('#add-item').css('display','block');
-                $('#prod_code').val(data.prod_code);
+                $("#prod_code").select2().select2('val',data.prod_code);
+
                 $('#cost').val(data.cost);
                 $('#price').val(data.price);
                 $('#form-inventory').attr('action','/branch_inventory/'+id);
