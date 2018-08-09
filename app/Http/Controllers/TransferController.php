@@ -31,8 +31,8 @@ class TransferController extends Controller
     }
     public function show_item($id)
     {
-        //$info = Branch_Inventory::with('inventory')->where(['branch_code' => $id]);
-        $info = Branch_Inventory::with('inventory')->where(['branch_code' => Auth::user()->branch]);
+        $info = Branch_Inventory::with('inventory')->where(['branch_code' => $id]);
+        //$info = Branch_Inventory::with('inventory')->where(['branch_code' => Auth::user()->branch]);
         return $info->get();
     }
     public function item_data($id , $code)

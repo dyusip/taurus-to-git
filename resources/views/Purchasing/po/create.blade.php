@@ -409,8 +409,9 @@
             $('#md-alert-error').html('');
             $('.code').each(function (i,e) {
                 if(item===$(this).val()){
-                    $('#item-error').html('Item already from the list(s)');
-                    $('#item-error').show();
+                    //$('#item-error').html('Item already from the list(s)');
+                    //('#item-error').show();
+                    toastr.error("Item already from the list(s)");
                     tr.find('input').val('');
                     tr.find('#select2-product-container').html('');
                     tr.find('#product').val('');

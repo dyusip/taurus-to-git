@@ -164,12 +164,24 @@
                                                 <th data-hide="phone" width="6%">Qty</th>
                                                 <th data-hide="phone,tablet" width="7%">Cost</th>
                                                 <th class="text-center" width="8%">Amount</th>
-                                                <th class="text-center tooltip-demo" width="3%"><a id="add-row" data-toggle="tooltip" title="Add more item"><i class="fa fa-plus-circle"></i></a></th>
+                                                <th class="text-center tooltip-demo" width="3%"><span data-toggle="tooltip" title="Add more item"><a href="#myModal" data-toggle="modal" ><i class="fa fa-plus-circle"></i></a></span></th>
                                             </tr>
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">
 
                                             </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <th width="9%">Code</th>
+                                                <th data-hide="phone" width="22%">Name</th>
+                                                <th data-hide="phone" width="6%">UOM</th>
+                                                <th data-hide="phone" width="5%">Available</th>
+                                                <th data-hide="phone" width="6%">Qty</th>
+                                                <th data-hide="phone,tablet" width="7%">Cost</th>
+                                                <th class="text-center" width="8%">Amount</th>
+                                                <th class="text-center tooltip-demo" width="3%"><span data-toggle="tooltip" title="Add more item"><a href="#myModal" data-toggle="modal" ><i class="fa fa-plus-circle"></i></a></span></th>
+                                            </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                     <div class="row">
@@ -199,6 +211,25 @@
                 </form>
             </div>
             <!-- modal-->
+            <div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content animated bounceInRight">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <i class="fa fa-laptop modal-icon"></i>
+                            <h4 class="modal-title">Add Item</h4>
+                            <small class="font-bold">Number of items to be added.</small>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group"><label>Number of items</label> <input type="text" id="count" placeholder="Enter number of items" class="form-control"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                            <button type="button" id="add-count" class="btn btn-primary">Add Items</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- /#page-wrapper -->
             <div class="footer">
                 <div class="pull-right">
@@ -357,25 +388,42 @@
         }
     });
     $('#add-row').on('click',function () {
-        //addRow();
-        //Choosen();
-        //Validate();
-        products();
+     //addRow();
+     //Choosen();
+     //Validate();
+     products();
+     });
+    $('#add-count').on('click',function () {
+        var tr = $('tbody tr').length;
+        var count = $('#count').val();
+        $('#main-spinner').fadeIn();
+        if(tr < 101 && (parseInt(tr) + parseInt(count)) < 101){
+            products();
+            $('#main-spinner').fadeOut();
+            $('#myModal').modal('hide');
+            count = $('#count').val('');
+        }else{
+            $('#main-spinner').fadeOut();
+            toastr.error("Item exceeds the limit.");
+        }
     });
     function products() {
         var branch = $('#branch_code').val();
+        var count = $('#count').val();
         $.ajax({
             url: "create/"+branch,
             success: function (data) {
                 //var data = jQuery.parseJSON(output);
                 //$('.product').html('');
-                addRow();
-                Choosen();
-                Validate();
-                $("#dataTables-salesOrder tr:last #product").append('<option value=""></option>');
-                $.each(data, function (index, value) {
-                    $("#dataTables-salesOrder tr:last #product").append("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
-                });
+                for (var i = 0; i < count; i++) {
+                    addRow();
+                    Choosen();
+                    Validate();
+                    $("#order-tbl tr:last #product").append('<option value=""></option>');
+                    $.each(data, function (index, value) {
+                        $("#order-tbl tr:last #product").append("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
+                    });
+                }
             }
         });
     }
@@ -404,8 +452,7 @@
         $('#md-alert-error').html('');
         $('.code').each(function (i,e) {
             if(item===$(this).val()){
-                $('#item-error').html('Item already from the list(s)');
-                $('#item-error').show();
+                toastr.error("Item already from the list(s)");
                 tr.find('input').val('');
                 tr.find('#select2-product-container').html('');
                 tr.find('#product').val('');
@@ -436,14 +483,14 @@
             }
         });
     });
-     function totalAmount() {
-         var total = 0;//totalAmount
-         $('.amount').each(function (i,e) {
-         var amount = $(this).val()-0;
-         total += amount;
-         });
-         $('#totalAmount').val(total)
-     }
+    function totalAmount() {
+        var total = 0;//totalAmount
+        $('.amount').each(function (i,e) {
+            var amount = $(this).val()-0;
+            total += amount;
+        });
+        $('#totalAmount').val(total)
+    }
     $('body').delegate('#remove-row','click',function () {
         var tr = $('tbody tr').length;
         if(tr > 1){

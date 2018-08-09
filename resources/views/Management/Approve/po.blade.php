@@ -246,6 +246,9 @@
     });
     @endif
     $(document).ready(function() {
+        datatable();
+    });
+    function datatable() {
         $('#dataTables-example').DataTable({
             dom: '<"html5buttons"B>lTfgitp',
             "bSort" : true,
@@ -268,7 +271,7 @@
                 }
             ]
         });
-    });
+    }
     $(document).ready(function () {
         Choosen();
     });
@@ -316,6 +319,9 @@
                 $('#totalAmount').val(data.header.total);
                 $('#main-spinner').fadeOut();
                 $('tbody').html('');
+                if ($.fn.dataTable.isDataTable('#dataTables-example')) {
+                    $('#dataTables-example').DataTable().clear().destroy();
+                }
                 $.each(data.detail, function (index, value) {
                     $('tbody').append("<tr> " +
                         "<td>"+ value.prod_code +"</td> " +
@@ -326,6 +332,8 @@
                         "<td>"+ value.prod_amount +"</td> " +
                         "</tr>");
                 });
+                datatable();
+
             }
         });
     });
