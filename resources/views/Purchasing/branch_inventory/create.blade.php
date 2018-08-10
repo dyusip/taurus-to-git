@@ -86,9 +86,9 @@
                                             </div>
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
-                                                <button class="btn btn-sm btn-primary btn-block" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
+                                                <button class="btn btn-sm btn-primary ladda-button ladda-button-demo btn-block" data-style="zoom-in" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
                                                 <a href="/branch_inventory/create" style="display: none" id="add-item" class="btn btn-sm btn-success btn-block" ><i class="fa fa-angle-double-left"></i><strong> Add Item</strong></a>
-                                                <a href="#"  id="replicate-item" class="btn btn-sm btn-success btn-block" ><i class="fa fa-angle-double-left"></i><strong> Replicate Item</strong></a>
+                                                <a href="#"  id="replicate-item" class="btn btn-sm btn-success  btn-block" ><i class="fa fa-angle-double-left"></i><strong> Replicate Item</strong></a>
                                             </div>
                                         </div>
                                     </div>
@@ -134,7 +134,7 @@
                                             </div>
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
-                                                <button class="btn btn-sm btn-primary btn-block" name="register" type="submit"><strong id="register">Create Replication</strong></button>
+                                                <button class="btn btn-sm btn-primary ladda-button ladda-button-replicate btn-block" data-style="zoom-in" name="register" type="submit"><strong id="register">Create Replication</strong></button>
                                                 <a href="#"  id="add-item-main" class="btn btn-sm btn-success btn-block" ><i class="fa fa-angle-double-left"></i><strong> Add Item</strong></a>
                                             </div>
                                         </div>
@@ -224,6 +224,7 @@
 <link href="{{ asset('css/plugins/select2/select2.min.css' )}}" rel="stylesheet">
 <link href="{{ asset('/js/plugins/gritter/jquery.gritter.css') }}" rel="stylesheet">
 <link href="{{ asset('/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
 
 <style>
     /* Absolute Center Spinner */
@@ -378,6 +379,10 @@
 @push('scripts')
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('js/plugins/select2/select2.full.min.js') }}"></script>
+<!--ladda-->
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 
 <script>
     $(document).ready(function() {
@@ -503,6 +508,14 @@
                 $('#form-replicate').show();
             $('#form-inventory').hide();
             @endif
+        });
+        $(document).on('submit','#form-inventory',function () {
+            var l = $( '.ladda-button-demo' ).ladda();
+            l.ladda( 'start' );
+        });
+        $(document).on('submit','#form-replicate',function () {
+            var l = $( '.ladda-button-replicate' ).ladda();
+            l.ladda( 'start' );
         });
     });
 </script>

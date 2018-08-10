@@ -181,7 +181,7 @@
                                                 <th data-hide="phone,tablet" width="8%">Price</th>
                                                 <th data-hide="phone,tablet" width="6%">Discount</th>
                                                 <th class="text-center" width="8%">Amount</th>
-                                                <th class="text-center tooltip-demo" width="5%"><a id="add-row" data-toggle="tooltip" title="Add more item"><i class="fa fa-plus-circle"></i></a></th>
+                                                <th class="text-center tooltip-demo" width="5%"><a class="add-row" data-toggle="tooltip" title="Add more item"><i class="fa fa-plus-circle"></i></a></th>
                                             </tr>
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">
@@ -212,13 +212,26 @@
                                                 <td class="text-center"><a class="text-danger"><i class="fa fa-remove"></i></a></td>
                                             </tr>
                                             </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <th width="10%">Code</th>
+                                                <th data-hide="phone" width="23%">Name</th>
+                                                <th data-hide="phone" width="5%">UOM</th>
+                                                <th data-hide="phone" width="5%">Available</th>
+                                                <th data-hide="phone" width="6%">Qty</th>
+                                                <th data-hide="phone,tablet" width="8%">Price</th>
+                                                <th data-hide="phone,tablet" width="6%">Discount</th>
+                                                <th class="text-center" width="8%">Amount</th>
+                                                <th class="text-center tooltip-demo" width="5%"><a class="add-row" data-toggle="tooltip" title="Add more item"><i class="fa fa-plus-circle"></i></a></th>
+                                            </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
 
                                             <div class="btn-group ">
-                                                <button  type="submit" class="btn btn-primary btn-sm"><i class="fa fa-check-circle"></i> Save Order</button>
+                                                <button  type="submit" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-check-circle"></i> Save Order</button>
                                             </div>
 
                                         </div>
@@ -256,12 +269,17 @@
 <link href="{{ asset('/css/plugins/chosen/chosen.css' )}}" rel="stylesheet">
 <link href="{{ asset('css/plugins/select2/select2.min.css' )}}" rel="stylesheet">
 <link href="{{ asset('css/plugins/datapicker/datepicker3.css' )}}" rel="stylesheet">
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
 @endpush
 @push('scripts')
 <script src="{{ asset('/js/plugins/chosen/chosen.jquery.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/plugins/select2/select2.full.min.js') }}"></script>
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
+<!--ladda-->
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 <script>
     $(document).ready(function () {
         Choosen();
@@ -416,7 +434,7 @@
         });
         $('#totalAmount').val(total)
     }
-    $('#add-row').on('click',function () {
+    $('.add-row').on('click',function () {
         addRow();
         Choosen();
         Validate();
@@ -452,7 +470,10 @@
         $('.tooltip').hide();
         totalAmount();
     });
-
+    $(document).on('submit','#myform',function () {
+        var l = $( '.ladda-button-demo' ).ladda();
+        l.ladda( 'start' );
+    });
     $(function () {
         $('#datepicker').datepicker();
     });

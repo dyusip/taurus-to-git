@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="wrapper wrapper-content animated fadeInRight">
-            <form method="post" name="myform" action="/receiving">
+            <form method="post" name="myform" id="myform" action="/receiving">
                 {{ csrf_field() }}
                 <input type="hidden" class="form-control" name="rh_no" id="rh_no" value="{{ $num }}">
                 <input type="hidden" class="form-control" name="rh_branch_code" id="rh_no" value="{{ Auth::user()->branch }}">
@@ -188,7 +188,7 @@
                                     </div>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-check-circle"></i> Receive</button>
+                                    <button type="submit" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-check-circle"></i> Receive</button>
                                 </div>
                             </div>
                         </div>
@@ -215,6 +215,8 @@
 <link href="{{ asset('/css/plugins/chosen/chosen.css' )}}" rel="stylesheet">
 <link href="{{ asset('css/plugins/select2/select2.min.css' )}}" rel="stylesheet">
 <link href="{{ asset('css/plugins/datapicker/datepicker3.css' )}}" rel="stylesheet">
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
+
 @endpush
 @push('scripts')
 <script src="{{ asset('/js/plugins/chosen/chosen.jquery.js') }}" type="text/javascript"></script>
@@ -222,6 +224,10 @@
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
 {{--<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>--}}
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
+
 
 <script>
     $(document).ready(function () {
@@ -318,6 +324,10 @@
         });
         $('#status').val(remarks)
     }
+    $(document).on('submit','#myform',function () {
+        var l = $( '.ladda-button-demo' ).ladda();
+        l.ladda( 'start' );
+    });
     $(function () {
         $('#datepicker').datepicker();
     });

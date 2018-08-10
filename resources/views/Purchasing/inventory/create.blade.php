@@ -123,7 +123,7 @@
                                             </div>
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
-                                                <button class="btn btn-sm btn-primary btn-block" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
+                                                <button class="btn btn-sm btn-primary ladda-button ladda-button-demo btn-block" data-style="zoom-in" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
                                             </div>
                                         </div>
                                     </div>
@@ -215,6 +215,7 @@
 @push('styles')
 <link href="{{ asset('/js/plugins/gritter/jquery.gritter.css') }}" rel="stylesheet">
 <link href="{{ asset('/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
 <style>
     /* Absolute Center Spinner */
     .loading {
@@ -350,6 +351,10 @@
 @endpush
 @push('scripts')
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
+<!--ladda-->
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 <script>
     $(document).ready(function() {
         /*$('#dataTables-example').DataTable({
@@ -414,6 +419,10 @@
         $(document).on('click','#btn-delete',function () {
             var id = $(this).data('id');
             $('#form-status').attr('action','/inventory/'+id);
+        });
+        $(document).on('submit','#form-inventory',function () {
+            var l = $( '.ladda-button-demo' ).ladda();
+            l.ladda( 'start' );
         });
     });
 </script>

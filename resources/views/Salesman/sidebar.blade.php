@@ -29,35 +29,13 @@
                 <a href="{{ url('/home') }}"><i class="fa fa-th-large"></i> <span class="nav-label">Home</span> </a>
             </li>
             <li>{{--{!! (Request::is('inventory/create') ? 'class="active"' : '') !!}--}}
-                <a href="javascript:;"><i class="fa fa-cubes"></i> <span class="nav-label">Inventory</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li><a href="{{ url('/inventory/create') }}">Create Item</a></li>
-                    <li><a href="{{ url('/branch_inventory/create') }}">Branch Inventory </a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;"><i class="fa fa-briefcase"></i> <span class="nav-label">Purchase Order</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li><a href="{{ url('/po/create') }}" id="btn-Purchase-page">Create</a></li>
-                    <li><a href="{{ url('/printpo') }}">Print</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="Receiving.php" id="btn-Receiving-page"><i class="fa fa-envelope"></i> <span class="nav-label">Receiving</span></a>
-
+                <a href="{{ url('/salesman/inventory') }}"><i class="fa fa-cubes"></i> <span class="nav-label">Inventory</span></a>
             </li>
             <li>
                 <a href="javascript:;"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales Order</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="{{ url('/so/create') }}">Create</a></li>
                     <li><a href="Return" id="btn-Return-page">Return</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;"><i class="fa fa-cube"></i> <span class="nav-label">Inventory</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li><a href="Inventory_create">Create</a></li>
-                    <li><a href="Inventory">Update</a></li>
                 </ul>
             </li>
             <li>

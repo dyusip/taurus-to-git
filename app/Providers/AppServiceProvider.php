@@ -29,8 +29,6 @@ class AppServiceProvider extends ServiceProvider
         View::share('po_count',$po);
         View::share('tf_count',$transfer);
        //View::share('notify_data',$data)
-
-
     }
 
     /**

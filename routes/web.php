@@ -72,6 +72,9 @@ Route::group(['middleware'=>'authenticated'], function (){
 
     //Salesman
     Route::resource('so','SO_Controller');
+    Route::get('/salesman/inventory','SmInventory\SmInventoryController@index');
+    Route::get('/salesman/inventory/{id}','SmInventory\SmInventoryController@show');
+
 });
 
 

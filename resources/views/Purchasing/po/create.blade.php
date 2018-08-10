@@ -221,7 +221,7 @@
 
                                         <div class="btn-group ">
                                             {{--<a href="#add-prod-modal" data-toggle="modal" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Add Item</a>--}}
-                                            <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-check-circle"></i> Create PO</button>
+                                            <button type="submit" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-check-circle"></i> Create PO</button>
                                         </div>
 
                                     </div>
@@ -279,6 +279,7 @@
 <link href="{{ asset('/css/plugins/chosen/chosen.css' )}}" rel="stylesheet">
 <link href="{{ asset('css/plugins/select2/select2.min.css' )}}" rel="stylesheet">
 <link href="{{ asset('css/plugins/datapicker/datepicker3.css' )}}" rel="stylesheet">
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
 @endpush
 @push('scripts')
 <script src="{{ asset('/js/plugins/chosen/chosen.jquery.js') }}" type="text/javascript"></script>
@@ -286,6 +287,9 @@
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
 {{--<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>--}}
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 
 <script>
     $(document).ready(function () {
@@ -516,6 +520,10 @@
     });
 </script>
 <script type="text/javascript">
+    $(document).on('submit','#myform',function () {
+        var l = $( '.ladda-button-demo' ).ladda();
+        l.ladda( 'start' );
+    });
     $(function () {
         $('#datepicker').datepicker();
     });

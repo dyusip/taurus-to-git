@@ -175,7 +175,7 @@
 
                                             <div class="btn-group ">
                                                 {{--<a href="#add-prod-modal" data-toggle="modal" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Add Item</a>--}}
-                                                <button type="submit" name="status" value="AP" class="btn btn-primary btn-sm"><i class="fa fa-thumbs-up"></i> Approve PO</button>
+                                                <button type="submit" name="status" value="AP" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-thumbs-up"></i> Approve PO</button>
                                                 <button type="submit" name="status" value="NA" class="btn btn-warning btn-sm"><i class="fa fa-thumbs-down"></i> Disapprove PO</button>
                                             </div>
 
@@ -213,14 +213,21 @@
 @push('styles')
 <link href="{{ asset('css/plugins/select2/select2.min.css' )}}" rel="stylesheet">
 <link href="{{ asset('/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
 @endpush
 @push('scripts')
 <script src="{{ asset('js/plugins/select2/select2.full.min.js') }}"></script>
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 {{--<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>--}}
-
+<!--ladda-->
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 <script>
     $(document).ready(function() {
+        datatable();
+    });
+    function datatable() {
         $('#dataTables-example').DataTable({
             dom: '<"html5buttons"B>lTfgitp',
             "bSort" : true,
@@ -243,7 +250,7 @@
                 }
             ]
         });
-    });
+    }
     $(document).ready(function () {
         Choosen();
     });
@@ -291,6 +298,9 @@
                 $('#totalAmount').val(data.header.tf_amount);
                 $('#main-spinner').fadeOut();
                 $('tbody').html('');
+                if ($.fn.dataTable.isDataTable('#dataTables-example')) {
+                    $('#dataTables-example').DataTable().clear().destroy();
+                }
                 $.each(data.detail, function (index, value) {
                     $('tbody').append("<tr> " +
                         "<td>"+ value.tf_prod_code +"</td> " +
@@ -301,10 +311,14 @@
                         "<td>"+ value.tf_prod_amount +"</td> " +
                         "</tr>");
                 });
+                datatable()
             }
         });
     });
-
+    $(document).on('submit','#myform',function () {
+        var l = $( '.ladda-button-demo' ).ladda();
+        l.ladda( 'start' );
+    });
 </script>
 <script type="text/javascript">
     @if (session('status'))
