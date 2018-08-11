@@ -25,7 +25,7 @@ class SmInventoryController extends Controller
             $inventories->firstOrFail();
         }*/
         return Datatables::of($inventories) ->addColumn('action', function ($inventories) {
-            return new HtmlString('<a href="#" class="text-success" id="btn-edit" data-id='.$inventories->id.' data-branch='.$inventories->branch_code.' data-prod='.$inventories->prod_code.'><i class="fa fa-edit"></i></a>');
+            return new HtmlString('<a href="#edit-prod-modal" data-toggle="modal" class="text-success" id="btn-edit" data-id='.$inventories->id.' data-branch='.$inventories->branch_code.' data-prod='.$inventories->prod_code.'><i class="fa fa-edit"></i></a>');
         })->make();
     }
 

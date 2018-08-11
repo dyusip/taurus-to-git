@@ -51,6 +51,7 @@
                                                         <th>Quantity</th>
                                                         <th>Price</th>
                                                         <th>UOM</th>
+                                                        {!! $branch->code==Auth::user()->branch?'<th class="text-center">Action</th>':''  !!}
                                                     </tr>
                                                     </thead>
                                                     <tbody class="tooltip-demo">
@@ -193,6 +194,7 @@
             {data: 2, name: 'branch__inventories.price'},
             {data: 11, name: 'inventories.uom'},
             //{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
+            {!! $branch->code==Auth::user()->branch?"{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}":''  !!}
         ]
         /* "columns": [
          { "data": 1 },
