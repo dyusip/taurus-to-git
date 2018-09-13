@@ -24,7 +24,22 @@ class SoHeader extends Model
     public function so_detail(){
         return $this->hasMany(SoDetail::class,'sod_code','so_code');
     }
+    public function so_sr_header(){
+        return $this->hasMany(SrHeader::class,'so_code','so_code');
+    }
     public function setCustNameAttribute($value){
         $this->attributes['cust_name'] =  strtoupper($value);
+    }
+    public function salesman()
+    {
+        return $this->belongsTo(User::class,'so_salesman','username');
+    }
+    public function mechanic()
+    {
+        return $this->belongsTo(User::class,'so_mechanic','username');
+    }
+    public function so_branch()
+    {
+        return $this->belongsTo(Branch::class,'branch_code','code');
     }
 }

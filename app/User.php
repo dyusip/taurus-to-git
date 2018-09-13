@@ -33,6 +33,9 @@ class User extends Authenticatable
     public function setPasswordAttribute($value){
         $this->attributes['password'] = bcrypt($value);
     }
+    public function setNameAttribute($value){
+        $this->attributes['name'] = strtoupper($value);
+    }
     public function branch_user()
     {
         return $this->belongsTo(Branch::class,'branch','code');
@@ -44,5 +47,21 @@ class User extends Authenticatable
     public function approved()
     {
         return $this->hasMany(PoHeader::class,'po_appby','username');
+    }
+    public function salesman()
+    {
+        return $this->hasMany(SoHeader::class,'so_salesman','username');
+    }
+    public function mechanic()
+    {
+        return $this->hasMany(SoHeader::class,'so_mechanic','username');
+    }
+    public function tf_prep_by()
+    {
+        return $this->hasMany(TransferHeaders::class,'tf_prepby','username');
+    }
+    public function tf_app_by()
+    {
+        return $this->hasMany(TransferHeaders::class,'tf_appby','username');
     }
 }

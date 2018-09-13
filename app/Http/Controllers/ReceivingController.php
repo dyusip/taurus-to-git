@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Branch_Inventory;
 use App\PoDetail;
 use App\PoHeader;
+use App\ReceivingDetail;
 use App\ReceivingHeader;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReceivingController extends Controller
@@ -14,19 +16,33 @@ class ReceivingController extends Controller
     //
     public function index()
     {
+        $route = Auth::user()->position == 'PURCHASING'?'Purchasing':'Partsman';
         if(ReceivingHeader::count()<1){
             $num = "TR-RE00001";
         }else{
             $num = ReceivingHeader::max('rh_no');
             ++$num;
         }
-        $pos = PoHeader::where(['status' => 'AP'])->get();
-        return view('Purchasing.receiving.create',compact('pos', 'num'));
+        $pos = PoHeader::where(['status' => 'AP'])->orWhere(['status' => 'OP'])->get();
+        return view($route.'.receiving.create',compact('pos','num'));
     }
     public function show_item($id)
     {
         $items = PoHeader::where(['po_code' => $id])->firstOrFail();
-        return json_encode(['header'=>$items, 'detail'=>$items->po_detail]);
+        $products = $items->po_detail;
+        //$details = ReceivingHeader::where(['rh_po_no' => $id])->firstOrFail();
+        $details = ReceivingDetail::where(['rd_status' => 'LA'])->whereHas('re_header', function ($query) use ($id) {
+            $query->where(['rh_po_no' => $id]);
+        });
+        if($details->count()>0){
+            $products = $details->get();
+        }
+        return json_encode(['header'=>$items, 'detail'=> $products]);
+    }
+    public function show_qty($id, $code)
+    {
+        $item = PoDetail::where(['pod_code' => $id, 'prod_code' =>$code])->firstOrFail();
+        return $item->prod_qty;
     }
     public function store(Request $request)
     {

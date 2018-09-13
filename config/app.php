@@ -165,6 +165,7 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         Codedge\Fpdf\FpdfServiceProvider::class, // [1]
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        App\Providers\ComposerServiceProvider::class,
 
         /*
          * Package Service Providers...

@@ -46,6 +46,10 @@ class Branch extends Model
     }
     public function tf_fr_branch_header()
     {
-        return $this->hasMany(TransferHeaders::class,'fron_branch','code');
+        return $this->hasMany(TransferHeaders::class,'from_branch','code');
+    }
+    public function so_header_branch()
+    {
+        return $this->hasMany(SoHeader::class,'branch_code','code');
     }
 }

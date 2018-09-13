@@ -14,10 +14,6 @@
                     <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    <!--                    <li>-->
-                    <!--                        <a data-toggle="modal" href="#modalUserProfile">-->
-                    <!--                            <i class="fa fa-user fa-fw"></i> <small>User Profile</small></a>-->
-                    <!--                    </li>-->
                     <li>
                         <a data-toggle="modal" href="#modalSettings">
                             <i class="fa fa-gear fa-fw"></i>

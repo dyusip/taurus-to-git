@@ -31,14 +31,14 @@
                             <ul class="nav nav-tabs">
                                 @php $ctr = 1 @endphp
                                 @foreach($branches as $branch)
-                                    <li class="{{($ctr==1)?'active':''}}"><a data-toggle="tab" href="#tab-{{ $ctr }}">{{ $branch->name }} </a>
+                                    <li class="{{($branch->code==Auth::user()->branch)?'active':''}}"><a data-toggle="tab" href="#tab-{{ $ctr }}">{{ $branch->name }} </a>
                                     @php $ctr++ @endphp
                                 @endforeach
                             </ul>
                             <div class="tab-content">
                                 @php $ctr = 1 @endphp
                                 @foreach($branches as $branch)
-                                    <div id="tab-{{$ctr}}" class="tab-pane {{($ctr==1)?'active':''}}">
+                                    <div id="tab-{{$ctr}}" class="tab-pane {{($branch->code==Auth::user()->branch)?'active':''}}">
                                         <div class="panel-body">
                                             <div class="table-responsive">
                                                 <table width="100%" class="table table-striped table-bordered table-hover dataTables-example" id="dataTables-{{$branch->code}}">
@@ -51,7 +51,7 @@
                                                         <th>Quantity</th>
                                                         <th>Price</th>
                                                         <th>UOM</th>
-                                                        {!! $branch->code==Auth::user()->branch?'<th class="text-center">Action</th>':''  !!}
+                                                        {{--{!! $branch->code==Auth::user()->branch?'<th class="text-center">Action</th>':''  !!}--}}
                                                     </tr>
                                                     </thead>
                                                     <tbody class="tooltip-demo">
@@ -93,9 +93,10 @@
                                             <!-- <i class="fa fa-shopping-cart modal-icon"></i>-->
 
                                             <h4 class="modal-title" id="md-title-edit">Edit Product</h4>
-                                            <small class="font-bold" id="md-info-edit">Infotrade Resources payable to vendor information.</small>
+                                            <small class="font-bold" id="md-info-edit">Taurus Merchandising inventory information</small>
                                         </div>
-                                        <form method="post" id="form_edit_prod" action="INV_FOLDER/update_inventory.php">
+                                        <form method="post" id="form_edit_prod" action="/salesman/inventory/update">
+                                            {{ csrf_field() }}
                                             <div class="modal-body">
                                                 <div class="spiner-example" id="md-spinner-edit" hidden style="position: fixed; right: 50%">
                                                     <div class="sk-spinner sk-spinner-wave">
@@ -111,35 +112,12 @@
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="form-group">
-                                                            <input type="hidden" name="prod_code_edit" id="prod_code_edit" readonly
-                                                                   class="form-control">
-                                                            <label>Cost</label>
-                                                            <input type="text" autocomplete="off" class="form-control" name="cost"
-                                                                   id="cost" >
-                                                        </div>
-
-                                                        <div class="form-group">
                                                             <label>Price</label>
                                                             <input type="hidden" id="prod-code" name="prod_code">
-                                                            <input type="text" placeholder="Price" autocomplete="off" name="prod_uprice_edit" id="prod_uprice_edit"
+                                                            <input type="text" placeholder="Price" autocomplete="off" name="price" id="price"
                                                                    class="form-control">
                                                         </div>
-                                                        <div class="form-group"><label>Description</label>
-                                                            <select name="desc" id="desc" required autocomplete="off" class="form-control">
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group"><label>UOM</label>
-                                                            <select name="uom" id="uom" required autocomplete="off" class="form-control">
-                                                                <option value="" disabled="disabled" selected>UOM</option>
-                                                                <option value="DRUM">DRUM</option>
-                                                                <option value="GALLON">GALLON</option>
-                                                                <option value="LITER">LITER</option>
-                                                                <option value="ML">ML</option>
-                                                                <option value="METER">METER</option>
-                                                                <option value="PIECE">PIECE</option>
-                                                                <option value="KIT">KIT</option>
-                                                            </select>
-                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -194,7 +172,7 @@
             {data: 2, name: 'branch__inventories.price'},
             {data: 11, name: 'inventories.uom'},
             //{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
-            {!! $branch->code==Auth::user()->branch?"{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}":''  !!}
+            {{--{!! $branch->code==Auth::user()->branch?"{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}":''  !!}--}}
         ]
         /* "columns": [
          { "data": 1 },
@@ -206,5 +184,43 @@
          ]*/
     });
     @endforeach
+    function validateNumber(event) {
+        var key = window.event ? event.keyCode : event.which;
+        var keychar = String.fromCharCode(key);
+        if (event.keyCode == 8 || event.keyCode == 46
+            || event.keyCode == 37 || event.keyCode == 39) {
+            return true;
+        }
+        else if ( key < 48 || key > 57 || keychar==".") {
+            return false;
+        }
+        else return true;
+    }
+    $(document).ready(function(){
+        $('[id^=price]').keypress(validateNumber);
+    });
+    $(document).on('click','#btn-edit', function () {
+        var prod = $(this).data('prod');
+        $.ajax({url:"inventory/edit/"+prod,
+            beforeSend: function() {
+                $('#main-spinner').fadeIn();
+            },
+            success: function(data) {
+                //var data = jQuery.parseJSON(output);
+                $('#main-spinner').fadeOut();
+                $('#price').val(data.price);
+                $('#prod-code').val(data.prod_code);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + " "+ thrownError);
+            }
+
+        });
+    });
+    @if (session('status'))
+        $(document).ready(function () {
+            toastr.success("{{ session('status') }}");
+        });
+    @endif
 </script>
 @endpush

@@ -124,10 +124,16 @@
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
                                                 <button class="btn btn-sm btn-primary ladda-button ladda-button-demo btn-block" data-style="zoom-in" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
+                                                <a href="javascript:;" onclick="event.preventDefault();
+                                                     document.getElementById('export-form').submit();" class="btn btn-sm btn-success btn-block"><strong>Export Inventory</strong></a>
                                             </div>
                                         </div>
                                     </div>
                                 </form>
+                                    <form action="{{ url('/inventory/export') }}" id="export-form" method="post">
+                                        {{ csrf_field() }}
+                                        <input type="hidden" name="_method" value="DELETE">
+                                    </form>
                             </div>
                         </div>
                     </div>

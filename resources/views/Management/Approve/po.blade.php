@@ -171,6 +171,7 @@
                                                 <th data-hide="phone" width="5%">UOM</th>
                                                 <th data-hide="phone" width="6%">Qty</th>
                                                 <th data-hide="phone,tablet" width="8%">Price</th>
+                                                <th data-hide="phone" width="6%">Less</th>
                                                 <th class="text-center" width="8%">Amount</th>
                                             </tr>
                                             </thead>
@@ -329,6 +330,7 @@
                         "<td>"+ value.prod_uom +"</td> " +
                         "<td>"+ value.prod_qty +"</td> " +
                         "<td>"+ value.prod_price +"</td> " +
+                        "<td>"+ value.prod_less +"%</td> " +
                         "<td>"+ value.prod_amount +"</td> " +
                         "</tr>");
                 });

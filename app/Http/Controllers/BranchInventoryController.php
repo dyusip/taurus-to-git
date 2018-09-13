@@ -154,7 +154,7 @@ class BranchInventoryController extends Controller
             ]);
         }
         //return $request->all();
-        $branch =Branch::where(['code' => $request->branch_to])->firstOrFail();
+        $branch = Branch::where(['code' => $request->branch_to])->firstOrFail();
         return redirect('/branch_inventory/create')->with('status_', "Product successfully replicated to $branch->name");
     }
 }

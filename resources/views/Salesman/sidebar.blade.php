@@ -35,21 +35,26 @@
                 <a href="javascript:;"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales Order</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
                     <li><a href="{{ url('/so/create') }}">Create</a></li>
-                    <li><a href="Return" id="btn-Return-page">Return</a></li>
+                    <li><a href="{{ url('/sr/create') }}">Return</a></li>
                 </ul>
             </li>
             <li>
-                <a href="Sales_Report"><i class="fa fa-calendar"></i> <span class="nav-label">Sales Report</span></a>
+                <a href="{{ url('/transferred/list') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transferred <span class="badge badge-danger">5</span></span></a>
+            </li>
+            <li>
+                <a href="{{ url('/transfer_report') }}"><i class="fa fa-arrow-circle-right"></i> <span class="nav-label">Transfer Report</span></a>
+            </li>
+            <li>
+                <a href="{{ url('/salesreport') }}"><i class="fa fa-calendar"></i> <span class="nav-label">Sales Report</span></a>
+            </li>
+            <li>
+                <a href="{{ url('/salesreturn_report') }}"><i class="fa fa-retweet"></i> <span class="nav-label">Return Report</span></a>
             </li>
             <li>
                 <a href="Incentive"><i class="fa fa-money"></i> <span class="nav-label">Incentive</span></a>
             </li>
             <li>
-                <a href="javascript:;"><i class="fa fa-user"></i> <span class="nav-label">Account </span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li><a href="create_mechanic">Create</a></li>
-                    <li><a href="update_mechanic">Update</a></li>
-                </ul>
+                <a href="{{ url('/mechanic') }}"><i class="fa fa-user"></i> <span class="nav-label">Account </span></a>
             </li>
 
         </ul>

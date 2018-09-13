@@ -7,6 +7,7 @@ use App\Inventory;
 use App\Branch;
 use Illuminate\Support\HtmlString;
 use Yajra\Datatables\Datatables;
+use Excel;
 
 class InventoryController extends Controller
 {
@@ -107,5 +108,25 @@ class InventoryController extends Controller
     public function destroy($id)
     {
         //
+        $items = Inventory::where(['status' => 'AC'])->get();
+        $data = array();
+       foreach ($items as $item)
+       {
+           $data[] = [
+               'name' => $item->name,
+               'desc' => $item->desc,
+               'cost' => '',
+               'quantity' => '',
+               'price' => ''
+           ];
+       }
+        return Excel::create('Taurus Inventory', function($excel) use ($data) {
+            $excel->setTitle('Taurus Inventory');
+            $excel->sheet('Sales-Inventory', function($sheet) use ($data)
+            {
+                $sheet->fromArray($data);
+
+            });
+        })->download('xlsx');
     }
 }

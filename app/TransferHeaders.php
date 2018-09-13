@@ -29,4 +29,12 @@ class TransferHeaders extends Model
     public function tf_fr_branch(){
         return $this->belongsTo(Branch::class,'from_branch','code');
     }
+    public function tf_prep_by()
+    {
+        return $this->belongsTo(User::class,'tf_prepby','username');
+    }
+    public function tf_app_by()
+    {
+        return $this->belongsTo(User::class,'tf_appby','username');
+    }
 }

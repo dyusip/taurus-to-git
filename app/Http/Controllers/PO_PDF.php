@@ -19,7 +19,7 @@ class PO_PDF extends Controller
         })->firstOrFail();
         $fpdf = new PDF_MC_Table();
         $fpdf->AddPage();
-        $path = public_path() . '/img/TaurusLogopng.png';
+        $path = public_path() . '/img/tinuod.gif';
         //$path = asset('/img/TaurusLogopng.png');
         $fpdf->Image($path, 10, 10, 80, 20);
         $fpdf->Ln(20);
@@ -50,8 +50,8 @@ class PO_PDF extends Controller
 
         $fpdf->Cell(190, 7, "Please Deliver this item/items on this Date: $po->req_date","LR",1);
         $fpdf->Cell(190, 3, "","LBR",1);
-        $header = array('PRODUCT NAME', 'QUANTITY', 'UOM', 'UNIT PRICE', 'AMOUNT');
-        $w = array(85, 21, 24, 30, 30);
+        $header = array('CODE','PRODUCT NAME', 'QTY', 'UOM', 'UNIT PRICE','DISCOUNT', 'AMOUNT');
+        $w = array(23, 66, 15, 21, 25, 20, 20);
         $i = 0;
         $fpdf->SetFont('Arial', 'B', 9);
         foreach ($header as $col) {
@@ -62,8 +62,8 @@ class PO_PDF extends Controller
         $fpdf->SetFont('Arial', '', 9);
 
         foreach ($po->po_detail as $product) {
-            $fpdf->SetWidths(array(85, 21, 24, 30, 30));
-            $fpdf->Row1(array($product->prod_name,$product->prod_qty,$product->prod_uom,$product->prod_price,$product->prod_amount));
+            $fpdf->SetWidths(array(23, 66, 15, 21, 25, 20, 20));
+            $fpdf->Row1(array($product->prod_code,$product->prod_name,$product->prod_qty,$product->prod_uom,$product->prod_price,$product->prod_less."%",$product->prod_amount));
         }
         //$fpdf->prodtable($header, $prodlist);
         $fpdf->SetFont('Arial', 'B', 9);
@@ -87,6 +87,8 @@ class PO_PDF extends Controller
         $fpdf->Cell(20, 5, "Prepared by: ","L",0);
         $fpdf->SetFont('Arial', 'U', 9);
         $fpdf->Cell(170, 5,$po->prepared->name ,"R",1);
+        $signature = public_path() . '/img/signature.png';
+        $fpdf->Cell(190,10,$fpdf->Image($signature, 150, $fpdf->GetY(),33.78),"LR",1,"R");
        /* if($app_by=="HENRY C. POBLADOR"){
             $pdf->Cell(190,10,$pdf->Image('../../signature.png', 150, $pdf->GetY(),33.78),"LR",1,"R");
         }elseif($app_by=="ILY-J B. VELASCO"){

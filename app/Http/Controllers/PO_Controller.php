@@ -56,6 +56,7 @@ class PO_Controller extends Controller
                 'prod_uom' => $request->uom[$item],
                 'prod_qty' => $request->qty[$item],
                 'prod_price' => $request->cost[$item],
+                'prod_less' => $request->less[$item],
                 'prod_amount' => $request->amount[$item],
             ]);
         }

@@ -22,12 +22,14 @@ class AppServiceProvider extends ServiceProvider
         $data = $notify->paginate('3');
         View::share('notify',$count);
         View::share('notify_data',$data);*/
-        $po = PoHeader::where(['status' => 'PD'])->count();
+        //This data below share globally
+        /*$po = PoHeader::where(['status' => 'PD'])->count();
         $transfer = TransferHeaders::where(['tf_status' => 'PD'])->count();
         $count = $po + $transfer;
         View::share('notify',$count);
         View::share('po_count',$po);
-        View::share('tf_count',$transfer);
+        View::share('tf_count',$transfer);*/
+        //End of data shared globally
        //View::share('notify_data',$data)
     }
 

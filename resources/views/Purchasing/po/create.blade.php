@@ -180,6 +180,7 @@
                                             <th data-hide="phone" width="5%">UOM</th>
                                             <th data-hide="phone" width="6%">Qty</th>
                                             <th data-hide="phone,tablet" width="8%">Price</th>
+                                            <th data-hide="phone" width="6%">Less</th>
                                             <th class="text-center" width="8%">Amount</th>
                                             <th class="text-center tooltip-demo" width="5%"><span data-toggle="tooltip" title="Add more item"><a href="#myModal" data-toggle="modal" ><i class="fa fa-plus-circle"></i></a></span></th>
                                         </tr>
@@ -199,6 +200,12 @@
                                             <td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td>
                                             <td><input type="text" name="qty[]" id="qty" required class="form-control qty" ></td>
                                             <td><input type="text" name="cost[]" id="cost" class="form-control" readonly></td>
+                                            <td><select name="less[]" id="less" class="form-control">
+                                                    @for ($i = 0; $i < 31; $i++)
+                                                        <option value="{{ $i }}">{{$i}}%</option>
+                                                    @endfor
+                                                </select>
+                                            </td>
                                             <td><input type="text" name="amount[]" id="amount" class="form-control amount" readonly></td>
                                             <td class="text-center"><a class="text-danger"><i class="fa fa-remove"></i></a></td>
                                         </tr>
@@ -210,6 +217,7 @@
                                             <th data-hide="phone" width="5%">UOM</th>
                                             <th data-hide="phone" width="6%">Qty</th>
                                             <th data-hide="phone,tablet" width="8%">Price</th>
+                                            <th data-hide="phone" width="6%">Less</th>
                                             <th class="text-center" width="8%">Amount</th>
                                             <th class="text-center tooltip-demo" width="5%"><span data-toggle="tooltip" title="Add more item"><a href="#myModal" data-toggle="modal" ><i class="fa fa-plus-circle"></i></a></span></th>
                                         </tr>
@@ -432,13 +440,15 @@
                     //var data = jQuery.parseJSON(output);
                     $('#item-error').fadeOut();
                     var qty = tr.find('#qty').val();
+                    var less = tr.find('#less').val();
                     tr.find('#code').val(data.prod_code);
                     tr.find('#prod_name').val(data.inventory.name);
                     //tr.find('#cost').val('₱'+parseFloat(data.cost).toFixed(2).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
                     tr.find('#cost').val(data.cost);
                     tr.find('#uom').val(data.inventory.uom);
-                    var amount = qty * data.cost;
+                    var amount = (data.cost * qty - ((data.cost * qty) * less/100)) ;
                     tr.find('#amount').val(amount);
+
                     totalAmount();
                     $('#main-spinner').fadeOut();
 
@@ -451,8 +461,18 @@
         $('tbody').delegate('#qty','keyup',function () {
             var tr = $(this).parent().parent();
             var qty = $(this).val();
+            var less = tr.find('#less').val();
             var price = tr.find('#cost').val();
-            var amount = price * qty;
+            var amount = (price * qty - ((price * qty) * less/100)) ;
+            tr.find('#amount').val(amount);
+            totalAmount();
+        });
+        $('tbody').delegate('#less','change',function () {
+            var tr = $(this).parent().parent();
+            var less = $(this).val();
+            var price = tr.find('#cost').val();
+            var qty = tr.find('#qty').val();
+            var amount = (price * qty - ((price * qty) * less/100)) ;
             tr.find('#amount').val(amount);
             totalAmount();
         });
@@ -505,6 +525,11 @@
                         '<td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td> ' +
                         '<td><input type="text" name="qty[]" required id="qty" class="form-control qty" ></td> ' +
                         '<td><input type="text" name="cost[]" id="cost" class="form-control" readonly></td> ' +
+                        '<td><select name="less[]" id="less" class="form-control">'+
+                        '@for ($i = 0; $i < 31; $i++)'+
+                        '<option value="{{ $i }}">{{$i}}%</option>'+
+                        '@endfor'+
+                        '</select></td> ' +
                         '<td><input type="text" name="amount[]" id="amount" class="form-control amount" readonly></td> ' +
                     '<td class="text-center tooltip-demo"><a id="remove-row" class="text-danger" data-toggle="tooltip" title="Remove item"><i class="fa fa-remove"></i></a></td> ' +
                     '</tr>';

@@ -174,8 +174,9 @@
                                         <div class="col-md-6">
 
                                             <div class="btn-group ">
+                                                <input type="hidden" name="status" id="val-status">
                                                 {{--<a href="#add-prod-modal" data-toggle="modal" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Add Item</a>--}}
-                                                <button type="submit" name="status" value="AP" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-thumbs-up"></i> Approve PO</button>
+                                                <button type="submit" name="status" id="btn-submit" value="AP" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-thumbs-up"></i> Approve PO</button>
                                                 <button type="submit" name="status" value="NA" class="btn btn-warning btn-sm"><i class="fa fa-thumbs-down"></i> Disapprove PO</button>
                                             </div>
 
@@ -316,6 +317,7 @@
         });
     });
     $(document).on('submit','#myform',function () {
+        $('#val-status').val($('#btn-submit').val());
         var l = $( '.ladda-button-demo' ).ladda();
         l.ladda( 'start' );
     });

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Branch;
+use App\Branch_Inventory;
+use App\Inventory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Session;
@@ -40,11 +43,23 @@ class ImportInventoryController extends Controller
                             'status' => $value->status,
 
                         ];
+                        if(Inventory::count()<1){
+                            $num = "TR-ITM00001";
+                        }else{
+                            $num = Inventory::max('code');
+                            ++$num;
+                        }
+                        $insertData = Inventory::updateOrCreate(['code' => $num],
+                            ['name' => $value->name,
+                            'desc' => $value->desc,
+                            'uom' => $value->uom,
+                            'pqty' => $value->pqty,
+                            'status' => 'AC',]);
                     }
 
                     if(!empty($insert)){
 
-                        $insertData = DB::table('inventories')->insert($insert);
+                        //$insertData = DB::table('inventories')->insert($insert);
                         if ($insertData) {
                             Session::flash('success', 'Your Data has successfully imported');
                         }else {
@@ -64,7 +79,8 @@ class ImportInventoryController extends Controller
     }
     public function branch_index()
     {
-        return view('Purchasing.import.branch');
+        $branches = Branch::where(['status' => 'AC'])->get();
+        return view('Purchasing.import.branch',compact('branches'));
     }
     public function branch_import(Request $request){
         //validate the xls file
@@ -90,11 +106,18 @@ class ImportInventoryController extends Controller
                             'quantity' => $value->quantity,
 
                         ];
+                        $product = Inventory::where('name', 'like', '%' . $value->name . '%')->first();
+                        $insertData = Branch_Inventory::updateOrCreate(['branch_code' => $request->branch_code,
+                            'prod_code' => $product->code],
+                            ['price' => $value->price,
+                            'cost' => $value->cost,
+                            'quantity' => $value->quantity]);
                     }
 
                     if(!empty($insert)){
 
-                        $insertData = DB::table('branch__inventories')->insert($insert);
+                        //$insertData = DB::table('branch__inventories')->insert($insert);
+
                         if ($insertData) {
                             Session::flash('success', 'Your Data has successfully imported');
                         }else {

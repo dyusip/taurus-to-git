@@ -1,4 +1,4 @@
-@if(Auth::user()->position!='PURCHASING')
+@if(Auth::user()->position!='PURCHASING' && Auth::user()->position!='AUDIT-OFFICER')
     <script>window.location='{{ url('/home') }}'</script>
 @endif
 <nav class="navbar-default navbar-static-side" role="navigation">
@@ -47,6 +47,9 @@
             </li>
             <li>
                 <a href="{{ url('/transfer/create') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transfer Item</span> </a>
+            </li>
+            <li>
+                <a href="{{ url('/receiving_report') }}"><i class="fa fa-archive"></i> <span class="nav-label">Receiving Report</span></a>
             </li>
             <li>
                 <a href="javascript:;"><i class="fa fa-cloud-upload"></i> <span class="nav-label">Import</span><span class="fa arrow"></span></a>

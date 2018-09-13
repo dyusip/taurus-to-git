@@ -1,73 +1,124 @@
-<!doctype html>
-<html lang="{{ app()->getLocale() }}">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ URL::to('css/app.css') }}">
+@extends('layout.main')
 
-    <title>Laravel Excel Import csv and XLS file in Database</title>
+@section('index-content')
+    <div id="wrapper">
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+        <!-- Navigation -->
+        @include('Purchasing.sidebar')
+        <div id="page-wrapper" class="gray-bg dashbard-1">
+            @include('Purchasing.header')
+            <div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-10">
+                    <h2>Import Inventory</h2>
+                    <ol class="breadcrumb">
+                        <li>
+                            <a href="/index">Home</a>
+                        </li>
+                        <li class="active">
+                            <strong>Import Inventory</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-lg-2">
 
-    <!-- Styles -->
-    <style>
-        html, body {
-            background-color: #fff;
-            color: #636b6f;
-            font-family: 'Raleway', sans-serif;
-            font-weight: 100;
-            height: 100vh;
-            margin: 0;
-            padding: 5%
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h2 class="text-center">
-        Laravel Excel/CSV Import
-    </h2>
+                </div>
+            </div>
 
-    @if ( Session::has('success') )
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">×</span>
-                <span class="sr-only">Close</span>
-            </button>
-            <strong>{{ Session::get('success') }}</strong>
-        </div>
-    @endif
+            <div class="wrapper wrapper-content animated fadeInRight">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Import Excel File <small>Fill in information available</small></h5>
+                                <div class="ibox-tools">
+                                    <a class="collapse-link">
+                                        <i class="fa fa-chevron-up"></i>
+                                    </a>
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                        <i class="fa fa-wrench"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-user">
+                                        <li><a href="#">Config option 1</a>
+                                        </li>
+                                        <li><a href="#">Config option 2</a>
+                                        </li>
+                                    </ul>
+                                    <a class="close-link">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="row">
+                                    <div class="col-sm-7 b-r">
+                                        @if ( Session::has('success') )
+                                            <div class="alert alert-success alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                    <span class="sr-only">Close</span>
+                                                </button>
+                                                <strong>{{ Session::get('success') }}</strong>
+                                            </div>
+                                        @endif
 
-    @if ( Session::has('error') )
-        <div class="alert alert-danger alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">×</span>
-                <span class="sr-only">Close</span>
-            </button>
-            <strong>{{ Session::get('error') }}</strong>
-        </div>
-    @endif
+                                        @if ( Session::has('error') )
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                    <span class="sr-only">Close</span>
+                                                </button>
+                                                <strong>{{ Session::get('error') }}</strong>
+                                            </div>
+                                        @endif
 
-    @if (count($errors) > 0)
-        <div class="alert alert-danger">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
-            <div>
-                @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
+                                        @if (count($errors) > 0)
+                                            <div class="alert alert-danger">
+                                                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                                                <div>
+                                                    @foreach ($errors->all() as $error)
+                                                        <p>{{ $error }}</p>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <form action="/import" method="POST" enctype="multipart/form-data">
+                                            {{ csrf_field() }}
+                                            Choose your xls/csv File : <input type="file" name="file" class="form-control">
+
+                                            <input type="submit" class="btn btn-primary btn-md" style="margin-top: 3%">
+                                        </form>
+
+                                    </div>
+                                    <div class="col-sm-5"><h4>Not a member?</h4>
+                                        <p>You can create an account:</p>
+                                        <p class="text-center">
+                                            <!--<i class="fa fa-shopping-cart big-icon"></i>-->
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- /#page-wrapper -->
+            <div class="footer">
+                <div class="pull-right">
+                    <strong></strong>
+                </div>
+                <div>
+                    <strong>Copyright</strong> INFOZ-ITWORKS &copy; 2018
+                </div>
             </div>
         </div>
-    @endif
+    </div>
+@endsection
+@push('styles')
 
-    <form action="/import" method="POST" enctype="multipart/form-data">
-        {{ csrf_field() }}
-        Choose your xls/csv File : <input type="file" name="file" class="form-control">
+@endpush
+@push('scripts')
 
-        <input type="submit" class="btn btn-primary btn-lg" style="margin-top: 3%">
-    </form>
-
-</div>
-</body>
-</html>
+@endpush

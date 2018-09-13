@@ -9,7 +9,7 @@
         @include('Purchasing.header')
         <div class="row wrapper border-bottom white-bg page-heading">
             <div class="col-lg-10">
-                <h2>Receving</h2>
+                <h2>Receiving</h2>
                 <ol class="breadcrumb">
                     <li>
                         <a href="/index">Home</a>
@@ -171,7 +171,7 @@
                                             <th width="9%">Code</th>
                                             <th data-hide="phone" width="20%">Name</th>
                                             <th data-hide="phone" width="5%">UOM</th>
-                                            <th data-hide="phone" width="6%">Qty Purchase</th>
+                                            <th data-hide="phone" width="6%" id="partial_rec">Qty Purchase</th>
                                             <th data-hide="phone" width="6%">Qty Receive</th>
                                             <th data-hide="phone" width="5%">Status</th>
                                             <th class="text-center" width="4%">Action</th>
@@ -232,6 +232,22 @@
 <script>
     $(document).ready(function () {
         Choosen();
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "progressBar": true,
+            "preventDuplicates": true,
+            "positionClass": "toast-top-right",
+            "onclick": null,
+            "showDuration": "400",
+            "hideDuration": "1000",
+            "timeOut": "7000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
     });
     function Choosen() {
         $(".select2_demo_1").select2();
@@ -275,19 +291,24 @@
                 $('#sup_contact').val(data.header.sup_contact);
                 $('#totalAmount').val(data.header.total);
                 $.each(data.detail, function (index, value) {
+                    var prod_code = (value.prod_code)?value.prod_code:value.rd_prod_code;
+                    var prod_name = (value.prod_name)?value.prod_name:value.rd_prod_name;
+                    var prod_uom = (value.prod_uom)?value.prod_uom:value.rd_prod_uom;
+                    var prod_qty = (value.prod_qty)?value.prod_qty:value.rd_prod_qty;
+                    var status = (value.rd_status)?value.rd_status:'';
+                    (value.rd_prod_code)?$('#partial_rec').html('Partial Rec'):$('#partial_rec').html('Qty Purchase');
                     var row = "<tr> " +
-                        "<td><input type='text' name='prod_code[]' value='"+value.prod_code+"' id='code' class='form-control code' readonly></td> " +
-                        "<td><input type='text' name='prod_name[]' value='"+value.prod_name+"' id='prod_name' class='form-control' readonly></td> " +
-                        '<td><input type="text" name="uom[]" value="'+value.prod_uom+'" id="uom" class="form-control" readonly></td> ' +
-                        '<td><input type="text" name="qty[]" value="'+value.prod_qty+'" id="qty" class="form-control" readonly></td> ' +
+                        "<td><input type='text' name='prod_code[]' value='"+prod_code+"' id='code' class='form-control code' readonly></td> " +
+                        "<td><input type='text' name='prod_name[]' value='"+prod_name+"' id='prod_name' class='form-control' readonly></td> " +
+                        '<td><input type="text" name="uom[]" value="'+prod_uom+'" id="uom" class="form-control" readonly></td> ' +
+                        '<td><input type="text" name="qty[]" value="'+prod_qty+'" id="qty" class="form-control" readonly></td> ' +
                         '<td><input type="text" name="rec_qty[]" required id="rec_qty" class="form-control"></td> ' +
-                        '<td class="text-center"><input type="text" name="status[]" id="status" class="form-control status" readonly></td> ' +
+                        '<td class="text-center"><input type="text" name="status[]" id="status" value="'+status+'" class="form-control status" readonly></td> ' +
                         '<td class="text-center tooltip-demo"><a id="remove-row" class="text-danger" data-toggle="tooltip" title="Remove item"><i class="fa fa-remove"></i></a></td> ' +
                         '</tr>';
                     $('tbody').append(row);
                 });
                 checkStatus();
-
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert(xhr.status + " "+ thrownError);
@@ -297,22 +318,53 @@
     //put received qty
     $('tbody').delegate('#rec_qty','keyup',function () {
         var tr = $(this).parent().parent();
+        var check = $('#partial_rec').text();
         var rec = $(this).val();
+        var po = $('#PO_No').val();
         var qty = tr.find('#qty').val();
-        if(rec > qty){
-            tr.find('#status').val('EX');
-        }else if(rec < qty){
-            tr.find('#status').val('LA');
-        }else if(rec == qty){
-            tr.find('#status').val('RE');
+        var code = tr.find('#code').val();
+        if(check=="Partial Rec"){
+            $.ajax({url: po+"/"+code,
+                beforeSend: function() {
+                    $('#main-spinner').fadeIn();
+                },
+                success: function(output) {
+                    var val = Number(output) - Number(qty);
+                    $('#main-spinner').fadeOut();
+                    if(Number(rec) > Number(val)){
+                        tr.find('#status').val('EX');
+                    }else if(Number(rec) < Number(val)){
+                        tr.find('#status').val('LA');
+                    }else if(Number(rec) == Number(val)){
+                        tr.find('#status').val('RE');
+                    }
+                    checkStatus();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status + " "+ thrownError);
+                }
+            });
+        }else{
+            if(Number(rec) > Number(qty)){
+                tr.find('#status').val('EX');
+            }else if(Number(rec) < Number(qty)){
+                tr.find('#status').val('LA');
+            }else if(Number(rec) == Number(qty)){
+                tr.find('#status').val('RE');
+            }
+            checkStatus();
         }
-        checkStatus();
     });
     //remove
     $('body').delegate('#remove-row','click',function () {
-        $(this).parent().parent().remove();
-        $('.tooltip').hide();
-        checkStatus();
+        var tr = $('tbody tr').length;
+        if(tr > 1){
+            $(this).parent().parent().remove();
+            $('.tooltip').hide();
+            checkStatus();
+        }else {
+            toastr.error("You cannot remove the first field");
+        }
     });
     //check Status
     function checkStatus() {

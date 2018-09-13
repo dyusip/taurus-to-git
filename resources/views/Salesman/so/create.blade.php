@@ -73,7 +73,7 @@
                                     <div class="row">
                                         <div class="col-sm-7 b-r">
                                             <div class="form-group"><label>Job Order #</label><input type="text" required name="jo_code" style="text-transform: uppercase" id="jo_code" placeholder="Job Order #" class="form-control"></div>
-                                            <div class="form-group"><label>Customer Name</label> <input type="text" required style="text-transform: uppercase" name="cust_name" id="cust_name" placeholder="Customer Name" class="form-control"></div>
+                                            <div class="form-group"><label>Customer Name</label> <input type="text" style="text-transform: uppercase" name="cust_name" id="cust_name" placeholder="Customer Name" class="form-control"></div>
                                             <div class="form-group"><label>Address</label> <input type="text" name="cust_address" style="text-transform: uppercase" id="cust_add" placeholder="Address" class="form-control"></div>
                                             <div class="form-group"><label>Contact #</label> <input type="text" name="cust_contact" style="text-transform: uppercase" id="cust_contact" placeholder="Contact #" class="form-control"></div>
                                             <div class="form-group">
@@ -201,7 +201,7 @@
                                                 <td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td>
                                                 <td><input type="text" id="available" readonly class="form-control qty" ></td>
                                                 <td><input type="text" name="qty[]" id="qty" required class="form-control qty" ></td>
-                                                <td><input type="text" name="price[]" id="price" class="form-control" readonly></td>
+                                                <td><input type="text" name="price[]" id="price" class="form-control" required></td>
                                                 <td><select name="less[]" id="less" class="form-control">
                                                         @for ($i = 0; $i < 31; $i++)
                                                             <option value="{{ $i }}">{{$i}}%</option>
@@ -347,6 +347,7 @@
     });
     function Validate() {
         $('[id^=qty]').keypress(validateNumber);
+        $('[id^=price]').keypress(validateNumber);
     }
     $('tbody').delegate('#product','change',function () {
         var tr = $(this).parent().parent();
@@ -405,7 +406,26 @@
         var less = tr.find('#less').val();
         var price = tr.find('#price').val();
         var available = tr.find('#available').val();
-        if(qty>available){
+        if(Number(qty)>Number(available)){
+            //alert('Quantity transfer should not exceeds available');
+            toastr.error("Quantity order should not exceeds available");
+            tr.find('#amount').val(0);
+            tr.find('#qty').val('');
+            totalAmount();
+        }else{
+            var amount = (price * qty - ((price * qty) * less/100)) ;
+            tr.find('#amount').val(amount);
+            totalAmount();
+        }
+    });
+
+    $('tbody').delegate('#price','keyup',function () {
+        var tr = $(this).parent().parent();
+        var price = $(this).val();
+        var less = tr.find('#less').val();
+        var qty = tr.find('#qty').val();
+        var available = tr.find('#available').val();
+        if(Number(qty)>Number(available)){
             //alert('Quantity transfer should not exceeds available');
             toastr.error("Quantity order should not exceeds available");
             tr.find('#amount').val(0);
@@ -454,7 +474,7 @@
             '<td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td> ' +
             '<td><input type="text" id="available" readonly class="form-control qty" ></td> ' +
             '<td><input type="text" name="qty[]" required id="qty" class="form-control qty" ></td> ' +
-            '<td><input type="text" name="price[]" id="price" class="form-control" readonly></td> ' +
+            '<td><input type="text" name="price[]" id="price" class="form-control" required></td> ' +
             '<td><select name="less[]" id="less" class="form-control">'+
                 '@for ($i = 0; $i < 31; $i++)'+
             '<option value="{{ $i }}">{{$i}}%</option>'+

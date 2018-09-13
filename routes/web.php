@@ -29,6 +29,9 @@ Auth::routes();
 //Route::get('/home', 'HomeController@index')->name('home')->middleware('authenticated');
 Route::group(['middleware'=>'authenticated'], function (){
     Route::get('/home', 'HomeController@index')->name('home');
+    //Route::post('/home', 'HomeController@search')->name('search');
+    Route::get('/home/item', 'HomeController@search')->name('search');
+    Route::get('/home/{id}/item', 'HomeController@suggest');
     /*Admin*/
     Route::get('/employee', ['uses' => 'EmployeeController@index'])->name('employee');
     Route::post('/employee/register', 'EmployeeController@registerEmp')->name('register');
@@ -50,6 +53,7 @@ Route::group(['middleware'=>'authenticated'], function (){
     Route::post('/po_pdf','PO_PDF@printPO');
     Route::get('/receiving/create','ReceivingController@index');
     Route::get('/receiving/{id}','ReceivingController@show_item');
+    Route::get('/receiving/{id}/{code}','ReceivingController@show_qty');
     Route::post('/receiving','ReceivingController@store');
     Route::get('/transfer/create','TransferController@index');
     Route::get('/transfer/{id}','TransferController@show_branch');
@@ -69,11 +73,43 @@ Route::group(['middleware'=>'authenticated'], function (){
     Route::get('/notification/transfer/{id}','NotificationController@show_tf');
     Route::post('/notification','NotificationController@save_po');
     Route::post('notification/transfer/','NotificationController@save_tf');
+    Route::get('/salesreport','SalesReport\SalesReportController@index');
+    Route::post('/salesreport','SalesReport\SalesReportController@show');
+    Route::post('/salesreport/print','SalesReport\SalesReportController@print_report');
+    Route::get('/receiving_report','RecReport\RecReportController@index');
+    Route::post('/receiving_report','RecReport\RecReportController@show');
+    Route::post('/receiving_report/print','RecReport\RecReportController@print_report');
+    Route::get('/transfer_report','TransReport\TransReportController@index');
+    Route::post('/transfer_report','TransReport\TransReportController@show');
+    Route::post('/transfer_report/print','TransReport\TransReportController@print_report');
+    Route::get('/salesreturn_report','SrReport\SrReportController@index');
+    Route::post('/salesreturn_report','SrReport\SrReportController@show');
+    Route::post('/salesreturn_report/print','SrReport\SrReportController@print_report');
+    Route::get('/inventory_analysis','InvAnalysis\InvAnaylsisController@index');
+    Route::post('/inventory_analysis','InvAnalysis\InvAnaylsisController@show');
 
     //Salesman
     Route::resource('so','SO_Controller');
     Route::get('/salesman/inventory','SmInventory\SmInventoryController@index');
     Route::get('/salesman/inventory/{id}','SmInventory\SmInventoryController@show');
+    Route::get('/salesman/inventory/edit/{id}','SmInventory\SmInventoryController@edit');
+    Route::get('/salesman/inventory/edit/{id}','SmInventory\SmInventoryController@edit');
+    Route::post('/salesman/inventory/update','SmInventory\SmInventoryController@update');
+    Route::get('/mechanic','MechAccController@index');
+    Route::post('/mechanic','MechAccController@store');
+    Route::post('/mechanic/{id}','MechAccController@update');
+    Route::get('/mechanic/{id}/edit','MechAccController@edit');
+    Route::resource('sr','SR_Controller');
+    Route::get('/transferred/list','TransferredListController@index');
+    Route::get('/transferred/list/{id}','TransferredListController@show');
+    Route::get('/transferred/list/pdf/{id}','TransferredListController@print_transferred');
+
+
+    //Partsman
+    Route::get('/transferred/print','TransferPrintController@index');
+    Route::get('/transferred/print/{id}','TransferPrintController@show');
+    Route::get('/transferred/print/pdf/{id}','TransferPrintController@print_transferred');
+
 
 });
 

@@ -379,7 +379,7 @@
         var qty = $(this).val();
         var available = tr.find('#available').val();
         var price = tr.find('#cost').val();
-        if(qty>available){
+        if(Number(qty)>Number(available)){
             //alert('Quantity transfer should not exceeds available');
             toastr.error("Quantity transfer should not exceeds available");
             tr.find('#amount').val(0);

@@ -28,7 +28,7 @@ class EmployeeController extends Controller
             'username' => 'required|string|max:25|unique:users',
         ]);
         $userCreate = User::create([
-            'name'           => strtoupper($request['name']),
+            'name'           => $request['name'],
             'email'          => $request['email'],
             'username'       => $request['username'],
             'position'       => $request['position'],
