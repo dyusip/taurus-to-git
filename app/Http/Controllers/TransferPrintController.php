@@ -21,7 +21,7 @@ class TransferPrintController extends Controller
         /*$transfer = TransferHeaders::where('transfer_details','transfer_details.td_code','=','transfer_headers.tf_code')
             ->with('tf_fr_branch')->with('tf_to_branch')
             ->select('*');*/
-        $transfer = TransferHeaders::where(['tf_status' => 'AP']) ->orderBy('tf_date', 'desc')->with('tf_fr_branch')->with('tf_to_branch')
+        $transfer = TransferHeaders::where(['tf_status' => 'AP']) ->with('tf_fr_branch')->with('tf_to_branch')//->orderBy('tf_date', 'desc')
             ->with('tf_prep_by')->with('tf_app_by')->selectRaw('distinct transfer_headers.*');
 
         /*if($inventories->count()==0){

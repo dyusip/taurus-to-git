@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Branch_Inventory;
 use App\Inventory;
+use App\SoHeader;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -72,5 +75,12 @@ class HomeController extends Controller
         }
         $json = array('ITEM' => $row);
         return json_encode($json);
+    }
+    public function show_mgt($from, $to)
+    {
+        $from = Carbon::createFromFormat('m-d-Y', $from)->format('Y-m-d');
+        $to = Carbon::createFromFormat('m-d-Y', $to)->format('Y-m-d');
+        $sales = SoHeader::whereBetween('so_date', [$from, $to])->select(DB::raw('sum(so_amount) as total, branch_code'))->groupBy('branch_code')->with('so_branch')->get();
+        return $sales;
     }
 }

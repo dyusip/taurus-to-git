@@ -21,6 +21,8 @@ class SalesReportController extends Controller
             $position = 'Partsman';
         }elseif (Auth::user()->position == 'SALESMAN'){
             $position = 'Salesman';
+        }elseif (Auth::user()->position == 'PURCHASING' || Auth::user()->position == 'AUDIT-OFFICER'){
+            $position = 'Purchasing';
         }
         return $position;
     }

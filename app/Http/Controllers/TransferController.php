@@ -8,9 +8,18 @@ use App\Inventory;
 use App\TransferHeaders;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Activity;
 class TransferController extends Controller
 {
+    private function position()
+    {
+        if (Auth::user()->position == 'SALESMAN'){
+            $position = 'Salesman';
+        }elseif (Auth::user()->position == 'PURCHASING' || Auth::user()->position == 'AUDIT-OFFICER'){
+            $position = 'Purchasing';
+        }
+        return $position;
+    }
     //
     public function index()
     {
@@ -21,7 +30,7 @@ class TransferController extends Controller
             ++$num;
         }
         $branches = Branch::where(['status' => 'AC'])->whereNotIn('code' , [Auth::user()->branch])->get();
-        return view('Purchasing.transfer.create',compact('branches','num'));
+        return view($this->position().'.transfer.create',compact('branches','num'));
     }
     public function show_branch($id)
     {
@@ -31,7 +40,7 @@ class TransferController extends Controller
     }
     public function show_item($id)
     {
-        $info = Branch_Inventory::with('inventory')->where(['branch_code' => $id]);
+        $info = Branch_Inventory::with('inventory')->where(['branch_code' => $id, 'branch_code' => Auth::user()->branch]);
         //$info = Branch_Inventory::with('inventory')->where(['branch_code' => Auth::user()->branch]);
         return $info->get();
     }
@@ -58,6 +67,7 @@ class TransferController extends Controller
                 'tf_prod_amount' => $request->amount[$item],
             ]);
         }
+        Activity::log("Created Transfer Item # $request->rh_po_no", Auth::user()->id);
         return redirect('/transfer/create')->with('status', "TF# ".strtoupper($request->tf_code)." successfully created.");
     }
 }

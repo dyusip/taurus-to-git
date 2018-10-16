@@ -10,6 +10,7 @@ use App\ReceivingHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Activity;
 
 class ReceivingController extends Controller
 {
@@ -64,6 +65,7 @@ class ReceivingController extends Controller
             $inventory = Branch_Inventory::where(['prod_code'=> $request->prod_code[$item], 'branch_code'=>$request->rh_branch_code]);
             $inventory->update(['quantity'=> DB::raw('quantity + '.$request->rec_qty[$item])]);
         }
+        Activity::log("Received PO# $request->rh_po_no", Auth::user()->id);
         return redirect('/receiving/create')->with('status', "PO# ".strtoupper($request->rh_po_no)." successfully received.");
     }
 }

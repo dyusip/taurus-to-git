@@ -32,12 +32,15 @@ Route::group(['middleware'=>'authenticated'], function (){
     //Route::post('/home', 'HomeController@search')->name('search');
     Route::get('/home/item', 'HomeController@search')->name('search');
     Route::get('/home/{id}/item', 'HomeController@suggest');
+    Route::get('/home/salesreport/{from}/{to}', 'HomeController@show_mgt');
     /*Admin*/
     Route::get('/employee', ['uses' => 'EmployeeController@index'])->name('employee');
     Route::post('/employee/register', 'EmployeeController@registerEmp')->name('register');
     Route::resource('branch','BranchsController');
     Route::get('/employee/{id}/edit','EmployeeController@edit');
     Route::post('/employee/{id}','EmployeeController@update');
+    Route::get('/logs','LogsController@index');
+    Route::get('/logs/data','LogsController@show');
     //Profile
     Route::get('/profile','EmployeeController@profile');
     Route::post('/update_password','EmployeeController@update_password');
@@ -87,6 +90,13 @@ Route::group(['middleware'=>'authenticated'], function (){
     Route::post('/salesreturn_report/print','SrReport\SrReportController@print_report');
     Route::get('/inventory_analysis','InvAnalysis\InvAnaylsisController@index');
     Route::post('/inventory_analysis','InvAnalysis\InvAnaylsisController@show');
+    Route::post('/inventory_analysis/print','InvAnalysis\InvAnaylsisController@print_report');
+    Route::get('/purchase_report','PurchaseReport\PurchaseReportController@index');
+    Route::post('/purchase_report','PurchaseReport\PurchaseReportController@show');
+    Route::post('/purchase_report/print','PurchaseReport\PurchaseReportController@print_report');
+    Route::get('/profit','Profit\ProfitController@index');
+    Route::post('/profit','Profit\ProfitController@show');
+    Route::post('/profit/print','Profit\ProfitController@print_report');
 
     //Salesman
     Route::resource('so','SO_Controller');

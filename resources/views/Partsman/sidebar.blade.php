@@ -31,6 +31,9 @@
             <li>{{--{!! (Request::is('inventory/create') ? 'class="active"' : '') !!}--}}
                 <a href="{{ url('/salesman/inventory') }}"><i class="fa fa-cubes"></i> <span class="nav-label">Inventory</span></a>
             </li>
+            <li>{{--{!! (Request::is('inventory/create') ? 'class="active"' : '') !!}--}}
+                <a href="{{ url('/inventory_analysis') }}"><i class="fa fa-cube"></i> <span class="nav-label">Inventory Analysis</span></a>
+            </li>
             <li>
                 <a href="{{ url('/receiving/create') }}"><i class="fa fa-envelope"></i> <span class="nav-label">Receiving</span></a>
             </li>
@@ -38,7 +41,10 @@
                 <a href="{{ url('/receiving_report') }}"><i class="fa fa-archive"></i> <span class="nav-label">Receiving Report</span></a>
             </li>
             <li>
-                <a href="{{ url('/transferred/print') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transferred <span class="badge badge-danger">5</span></span></a>
+                <a href="{{ url('/purchase_report') }}"><i class="fa fa-cart-plus"></i> <span class="nav-label">Purchase Report</span></a>
+            </li>
+            <li>
+                <a href="{{ url('/transferred/print') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transferred </span></a>
             </li>
             <li>
                 <a href="{{ url('/transfer_report') }}"><i class="fa fa-arrow-circle-right"></i> <span class="nav-label">Transfer Report</span></a>

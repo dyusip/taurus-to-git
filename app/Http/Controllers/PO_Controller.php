@@ -9,6 +9,7 @@ use App\PoHeader;
 use Codedge\Fpdf\Fpdf\Fpdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Activity;
 
 class PO_Controller extends Controller
 {
@@ -60,6 +61,7 @@ class PO_Controller extends Controller
                 'prod_amount' => $request->amount[$item],
             ]);
         }
+        Activity::log("Created PO# $request->po_code", Auth::user()->id);
         return redirect('/po/create')->with('status', "PO# ".strtoupper($request->po_code)." successfully created.");
     }
     public function printPOindex()

@@ -8,7 +8,7 @@ use App\TransferHeaders;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Activity;
 class NotificationController extends Controller
 {
     //
@@ -28,6 +28,7 @@ class NotificationController extends Controller
         }
         $app_po->update(['status' => $request->status, 'po_appby' => Auth::user()->username]);
         $status = ($request->status=='AP')?'Approved':'Disapproved';
+        Activity::log("$status PO # $request->PONo", Auth::user()->id);
         return redirect('/notification/po')->with('status', "PO# $request->PONo successfully $status");
     }
     //Transfer
@@ -56,6 +57,7 @@ class NotificationController extends Controller
             }
         }
         $status = ($request->status=='AP')?'Approved':'Disapproved';
+        Activity::log("$status PO # $request->PONo", Auth::user()->id);
         return redirect('/notification/transfer')->with('status', "Transfer# $request->tf_code successfully $status");
     }
 }

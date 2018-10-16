@@ -35,6 +35,9 @@
                 <a href="{{ url('/inventory_analysis') }}"><i class="fa fa-cube"></i> <span class="nav-label">Inventory Analysis</span></a>
             </li>
             <li>
+                <a href="{{ url('/purchase_report') }}"><i class="fa fa-cart-plus"></i> <span class="nav-label">Purchase Report</span></a>
+            </li>
+            <li>
                 <a href="{{ url('/receiving_report') }}"><i class="fa fa-archive"></i> <span class="nav-label">Receiving Report</span></a>
             </li>
             <li>
@@ -44,17 +47,13 @@
                 <a href="{{ url('/salesreport') }}"><i class="fa fa-calendar"></i> <span class="nav-label">Sales Report</span></a>
             </li>
             <li>
+                <a href="{{ url('/profit') }}"><i class="fa fa-filter"></i> <span class="nav-label">Profit Margin Analysis</span></a>
+            </li>
+            <li>
                 <a href="{{ url('/salesreturn_report') }}"><i class="fa fa-retweet"></i> <span class="nav-label">Return Report</span></a>
             </li>
             <li>
                 <a href="Incentive"><i class="fa fa-money"></i> <span class="nav-label">Incentive</span></a>
-            </li>
-            <li>
-                <a href="javascript:;"><i class="fa fa-user"></i> <span class="nav-label">Account </span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li><a href="create_mechanic">Create</a></li>
-                    <li><a href="update_mechanic">Update</a></li>
-                </ul>
             </li>
 
         </ul>

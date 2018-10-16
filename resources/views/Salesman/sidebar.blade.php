@@ -39,7 +39,10 @@
                 </ul>
             </li>
             <li>
-                <a href="{{ url('/transferred/list') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transferred <span class="badge badge-danger">5</span></span></a>
+                <a href="{{ url('/transfer/create') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transfer Item</span> </a>
+            </li>
+            <li>
+                <a href="{{ url('/transferred/list') }}"><i class="fa fa-envelope"></i> <span class="nav-label">Received </span></a>
             </li>
             <li>
                 <a href="{{ url('/transfer_report') }}"><i class="fa fa-arrow-circle-right"></i> <span class="nav-label">Transfer Report</span></a>

@@ -19,7 +19,7 @@ class TransReportController extends Controller
             $position = 'Management';
         }elseif (Auth::user()->position == 'PARTS-MAN'){
             $position = 'Partsman';
-        }elseif (Auth::user()->position == 'PURCHASING'){
+        }elseif (Auth::user()->position == 'PURCHASING' || Auth::user()->position == 'AUDIT-OFFICER'){
             $position = 'Purchasing';
         }elseif (Auth::user()->position == 'SALESMAN'){
             $position = 'Salesman';
@@ -38,7 +38,7 @@ class TransReportController extends Controller
         if($request->optCustType == "all"){
             $items = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])->get();
         }elseif($request->optCustType == "branch"){
-            $items = TransferHeaders::where(['to_branch' => $request->branch, 'tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])->get();
+            $items = TransferHeaders::where(['to_branch' => $request->branch, 'tf_status' => 'AP'])->orWhere(['from_branch' => Auth::user()->branch])->whereBetween('tf_date', [$from, $to])->get();
         }
         $branches = Branch::where(['status'=>'AC'])->get();
         return view($this->position().'.transfer_report.transfer',compact('items','request', 'branches'));
@@ -51,7 +51,7 @@ class TransReportController extends Controller
         if($request->optCustType == "all"){
             $items = TransferHeaders::whereBetween('tf_date', [$from, $to])->get();
         }elseif($request->optCustType == "branch"){
-            $items = TransferHeaders::where(['to_branch' => $request->branch])->whereBetween('tf_date', [$from, $to])->get();
+            $items = TransferHeaders::where(['to_branch' => $request->branch])->orWhere(['from_branch' => Auth::user()->branch])->whereBetween('tf_date', [$from, $to])->get();
         }
         $data = array();
         $total =  0;

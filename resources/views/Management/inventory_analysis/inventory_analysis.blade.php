@@ -108,7 +108,7 @@
                                     </div>--}}
                                 </div>
                                 <div class="ibox-content tooltip-demo">
-                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/salesreport/print">
+                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/inventory_analysis/print">
                                         <span aria-hidden="true" class="fa fa-print fa-5x"></span>
                                     </button>
 
@@ -134,31 +134,31 @@
                                                             @php $onhand = $inventory->totalqty  @endphp
                                                         @endif
                                                     @endforeach
-                                                        <tr>
-                                                            {{--<td class="text-center">{{ ucfirst($request->optCustType) }}</td>--}}
-                                                            <td>{{ $sale->sod_prod_code}}</td>
-                                                            <td>{{ $sale->sod_prod_name}}</td>
-                                                            <td>{{ $sale->sod_prod_uom}}</td>
-                                                            <td>{{ $onhand }}</td>
-                                                            <td>{{ $sale->qty}}</td>
-                                                        </tr>
+                                                    <tr>
+                                                        {{--<td class="text-center">{{ ucfirst($request->optCustType) }}</td>--}}
+                                                        <td>{{ $sale->sod_prod_code}}</td>
+                                                        <td>{{ $sale->sod_prod_name}}</td>
+                                                        <td>{{ $sale->sod_prod_uom}}</td>
+                                                        <td>{{ $onhand }}</td>
+                                                        <td>{{ $sale->qty}}</td>
+                                                    </tr>
 
-                                                   {{-- @endforeach--}}
+                                                    {{-- @endforeach--}}
                                                 @endforeach
                                             @endif
                                             </tbody>
-                                           {{-- <tr>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <td style="display: none;"></td>
-                                                <th class="text-right" colspan="6">TOTAL AMOUNT</th>
-                                                <th>{{ @$total }}</th>
-                                            </tr>--}}
+                                            {{-- <tr>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <td style="display: none;"></td>
+                                                 <th class="text-right" colspan="6">TOTAL AMOUNT</th>
+                                                 <th>{{ @$total }}</th>
+                                             </tr>--}}
 
                                         </table>
                                     </div>

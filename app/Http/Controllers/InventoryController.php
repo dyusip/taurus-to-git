@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Inventory;
 use App\Branch;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Yajra\Datatables\Datatables;
 use Excel;
+use Activity;
 
 class InventoryController extends Controller
 {
@@ -51,6 +53,7 @@ class InventoryController extends Controller
     {
         //
         Inventory::create($request->all());
+        Activity::log("Created a product {$request['name']}", Auth::user()->id);
         return redirect('/inventory/create')->with('status', " ".strtoupper($request['name'])."'s account successfully created");
     }
 
@@ -96,6 +99,7 @@ class InventoryController extends Controller
         //
         $inventory = Inventory::findOrFail($id);
         $inventory->update($request->all());
+        Activity::log("Updated product {$request['name']}", Auth::user()->id);
         return redirect('/inventory/create')->with('status', " ".strtoupper($request['name'])." successfully updated");
     }
 

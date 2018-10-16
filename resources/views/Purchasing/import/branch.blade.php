@@ -81,7 +81,7 @@
                                                 </div>
                                             </div>
                                         @endif
-                                        <form action="/import/branch" method="POST" enctype="multipart/form-data">
+                                        <form action="/import/branch" id="form-import" method="POST" enctype="multipart/form-data">
                                             {{ csrf_field() }}
                                             <div class="form-group">
                                                 Select Branch
@@ -94,7 +94,7 @@
                                             </div>
                                             Choose your xls/csv File : <input type="file" name="file" class="form-control">
 
-                                            <input type="submit" class="btn btn-primary btn-md" style="margin-top: 3%">
+                                            <button type="submit" class="btn btn-primary ladda-button ladda-button-import btn-md" data-style="zoom-in" style="margin-top: 3%">Submit</button>
                                         </form>
 
                                     </div>
@@ -126,8 +126,17 @@
     </div>
 @endsection
 @push('styles')
-
+<link href="{{ asset('css/plugins/ladda/ladda-themeless.min.css' )}}" rel="stylesheet">
 @endpush
 @push('scripts')
-
+<!--ladda-->
+<script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
+<script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
+<script>
+    $(document).on('submit','#form-import',function () {
+        var l = $( '.ladda-button-import' ).ladda();
+        l.ladda( 'start' );
+    });
+</script>
 @endpush

@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Activity;
 
 class SO_Controller extends Controller
 {
@@ -68,6 +69,7 @@ class SO_Controller extends Controller
             $inventory = Branch_Inventory::where(['prod_code'=> $request->prod_code[$item], 'branch_code'=>$request->branch_code]);
             $inventory->update(['quantity'=> DB::raw('quantity - '.$request->qty[$item])]);
         }
+        Activity::log("Created SO # $request->so_code", Auth::user()->id);
         return redirect('/so/create')->with('status', "SO# ".strtoupper($request->so_code)." successfully created.");
     }
 

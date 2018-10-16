@@ -8,6 +8,7 @@ use App\SoHeader;
 use App\SrHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Activity;
 
 class SR_Controller extends Controller
 {
@@ -71,6 +72,7 @@ class SR_Controller extends Controller
                 $inventory->update(['quantity' => DB::raw('quantity + ' . $request->qty[$item])]);
             }
         }
+        Activity::log("Returned SO # $request->so_code", Auth::user()->id);
         return redirect('/sr/create')->with('status', "SO# ".strtoupper($request->so_code)." successfully returned.");
     }
 

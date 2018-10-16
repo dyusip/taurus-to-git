@@ -9,6 +9,7 @@ use App\Branch;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Validator;
+use Activity;
 
 class EmployeeController extends Controller
 {
@@ -39,6 +40,7 @@ class EmployeeController extends Controller
             'contact'        => $request['contact']
         ]);
         if($userCreate){
+            Activity::log("Created {$request['name']}'s user account", Auth::user()->id);
             return redirect('employee')->with('status', " ".strtoupper($request['name'])."'s account successfully created");
         }
         return back();
@@ -53,6 +55,7 @@ class EmployeeController extends Controller
 
         $emp = User::findOrFail($id);
         $emp->update($request->all());
+        Activity::log("Updated {$request['name']}'s user account", Auth::user()->id);
         if(!isset($request['name']))
             return redirect('employee')->with('status', "Employee account successfully updated");
         return redirect('employee')->with('status', " ".strtoupper($request['name'])."'s account successfully updated");
@@ -72,7 +75,8 @@ class EmployeeController extends Controller
             'confirm_pass' => 'required|same:new_pass',
         ]);
         $user = User::findOrFail(Auth::user()->id);
-        $user->update(['password' => bcrypt($request->new_pass)]);
+        $user->update(['password' => $request->new_pass]);
+        Activity::log(Auth::user()->name." changed his/her password", Auth::user()->id);
         return redirect($request->route)->with('password_status', "Password successfully updated.");
     }
 }

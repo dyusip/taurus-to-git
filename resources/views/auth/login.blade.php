@@ -17,7 +17,6 @@
 </head>
 
 <body class="gray-bg">
-
 <div class="loginColumns animated fadeInDown">
     <div class="row">
 
@@ -83,6 +82,5 @@
     </div>
 </div>
 </body>
-
 </html>
 

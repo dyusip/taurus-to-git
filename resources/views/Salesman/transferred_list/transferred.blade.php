@@ -101,7 +101,8 @@
             {data: 14+'.name', name: 'tf_app_by.name'},
             {data: 15, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
             {{--{!! $branch->code==Auth::user()->branch?"{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}":''  !!}--}}
-        ]
+        ],
+        "order": [[3, 'desc']]
     });
 </script>
 @endpush

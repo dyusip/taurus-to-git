@@ -35,6 +35,9 @@
                     <li><a href="{{ url('/branch_inventory/create') }}">Branch Inventory </a></li>
                 </ul>
             </li>
+            <li>{{--{!! (Request::is('inventory/create') ? 'class="active"' : '') !!}--}}
+                <a href="{{ url('/inventory_analysis') }}"><i class="fa fa-cube"></i> <span class="nav-label">Inventory Analysis</span></a>
+            </li>
             <li>
                 <a href="javascript:;"><i class="fa fa-briefcase"></i> <span class="nav-label">Purchase Order</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
@@ -49,7 +52,20 @@
                 <a href="{{ url('/transfer/create') }}"><i class="fa fa-mail-forward"></i> <span class="nav-label">Transfer Item</span> </a>
             </li>
             <li>
+                <a href="{{
+                 url('/transfer_report') }}"><i class="fa fa-arrow-circle-right"></i> <span class="nav-label">Transfer Report</span></a>
+            </li>
+            <li>
+                <a href="{{ url('/purchase_report') }}"><i class="fa fa-cart-plus"></i> <span class="nav-label">Purchase Report</span></a>
+            </li>
+            <li>
                 <a href="{{ url('/receiving_report') }}"><i class="fa fa-archive"></i> <span class="nav-label">Receiving Report</span></a>
+            </li>
+            <li class="{{ Auth::user()->position!='AUDIT-OFFICER'?'hide':'' }}">
+                <a href="{{ url('/salesreport') }}"><i class="fa fa-calendar"></i> <span class="nav-label">Sales Report</span></a>
+            </li>
+            <li class="{{ Auth::user()->position!='AUDIT-OFFICER'?'hide':'' }}">
+                <a href="{{ url('/salesreturn_report') }}"><i class="fa fa-retweet"></i> <span class="nav-label">Return Report</span></a>
             </li>
             <li>
                 <a href="javascript:;"><i class="fa fa-cloud-upload"></i> <span class="nav-label">Import</span><span class="fa arrow"></span></a>

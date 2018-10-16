@@ -6,10 +6,12 @@ use App\Branch;
 use App\Branch_Inventory;
 use App\Inventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rule;
 use Validator;
 use Yajra\Datatables\Datatables;
+use Activity;
 
 class BranchInventoryController extends Controller
 {
@@ -64,6 +66,7 @@ class BranchInventoryController extends Controller
         $prod = Inventory::where(['code'=>$request->prod_code])->first();
 
         Branch_Inventory::create($request->all());
+        Activity::log("Created a product $prod->name for $branch->name", Auth::user()->id);
         return redirect('/branch_inventory/create')->with('status', "Product $prod->name successfully created for $branch->name");
 
     }
@@ -122,6 +125,7 @@ class BranchInventoryController extends Controller
         //
         $inventory = Branch_Inventory::where(['prod_code' => $request->prod_code, 'branch_code' => $request->branch_code]);
         $inventory->update(['cost' => $request->cost, 'price' => $request->price]);
+        Activity::log("Updated a product $request->prod_code for $request->branch_code", Auth::user()->id);
         return redirect('/branch_inventory/create')->with('status', "Product successfully updated");
 
     }
@@ -155,6 +159,7 @@ class BranchInventoryController extends Controller
         }
         //return $request->all();
         $branch = Branch::where(['code' => $request->branch_to])->firstOrFail();
+        Activity::log("Replicated inventory from $request->branch_code to $request->branch_to", Auth::user()->id);
         return redirect('/branch_inventory/create')->with('status_', "Product successfully replicated to $branch->name");
     }
 }

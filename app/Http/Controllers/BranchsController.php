@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Branch;
+use Activity;
+use Illuminate\Support\Facades\Auth;
+
 class BranchsController extends Controller
 {
     /**
@@ -52,6 +55,7 @@ class BranchsController extends Controller
     {
        //
        Branch::create($request->all());
+       Activity::log("Created {$request['name']}'s branch", Auth::user()->id);
        return redirect('/branch/create')->with('status', " ".strtoupper($request['name'])."'s account successfully created");
     }
 
@@ -95,6 +99,7 @@ class BranchsController extends Controller
         /*if(!isset($request->nameoffield))
             $branch->update(array_merge($request->all(),['nameofield','value']));*/
         $branch->update($request->all());
+        Activity::log("Updated {$request['name']}'s branch", Auth::user()->id);
         return redirect('/branch/create')->with('status', " ".strtoupper($request['name'])."'s account successfully updated");
 
     }
@@ -128,6 +133,7 @@ class BranchsController extends Controller
         return redirect('/branch/create')->with('status', "Account successfully $status");*/
         $branch = Branch::findOrFail($id);
         $branch->update($request->all());
+        Activity::log("Updated branch's status", Auth::user()->id);
         return redirect('/branch/create')->with('status', "Account successfully updated");
     }
 }

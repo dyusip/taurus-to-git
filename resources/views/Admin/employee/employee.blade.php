@@ -92,6 +92,7 @@
                                                 <option value="ACCOUNTING" {{ (old("position") == 'ACCOUNTING' ? "selected":"") }}>ACCOUNTING</option>
                                                 <option value="PARTS-MAN" {{ (old("position") == 'PARTS-MAN' ? "selected":"") }}>PARTS-MAN</option>
                                                 <option value="SALESMAN" {{ (old("position") == 'SALESMAN' ? "selected":"") }}>SALESMAN</option>
+                                                <option value="MECHANIC" {{ (old("position") == 'MECHANIC' ? "selected":"") }}>MECHANIC</option>
                                                 <option value="PURCHASING" {{ (old("position") == 'PURCHASING' ? "selected":"") }}>PURCHASING</option>
                                                 <option value="AUDIT-OFFICER" {{ (old("position") == 'AUDIT-OFFICER' ? "selected":"") }}>AUDIT-OFFICER</option>
                                             </select>

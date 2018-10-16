@@ -64,7 +64,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    //'timezone' => 'UTC',
+    'timezone' => 'asia/manila',
 
     /*
     |--------------------------------------------------------------------------
@@ -166,6 +167,7 @@ return [
         Codedge\Fpdf\FpdfServiceProvider::class, // [1]
         Maatwebsite\Excel\ExcelServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
+        Spatie\Activitylog\ActivitylogServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -232,6 +234,7 @@ return [
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
         'Fpdf' => Codedge\Fpdf\Facades\Fpdf::class, // [2]
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Activity' => Spatie\Activitylog\ActivitylogFacade::class,
 
     ],
 
