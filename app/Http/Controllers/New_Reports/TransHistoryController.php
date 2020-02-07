@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TransHistory;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\TransferDetails;
@@ -31,7 +31,7 @@ class TransHistoryController extends Controller
     public function index()
     {
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.transfer_history.trans_history',compact('branches'));
+        return view($this->position().'.new_reports.trans_history',compact('branches'));
     }
     public function show(Request $request)
     {
@@ -54,7 +54,7 @@ class TransHistoryController extends Controller
                 //$join->on('bri.branch_code','=','to_branch');
                 $join->on('bri.branch_code','=','from_branch');
             })
-            ->select(DB::raw('from_branch, to_branch, SUM(tf_prod_qty) as total_qty, SUM(bri.cost * tf_prod_qty) as total_amount'))
+            ->select(DB::raw('from_branch, to_branch, SUM(tf_prod_qty) as total_qty, SUM(tf_prod_price * tf_prod_qty) as total_amount'))
             ->groupBy('from_branch','to_branch')
             ->get();
         /*foreach ($items as $item)
@@ -63,7 +63,7 @@ class TransHistoryController extends Controller
         }*/
 
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.transfer_history.trans_history',compact('branches','items','request'));
+        return view($this->position().'.new_reports.trans_history',compact('branches','items','request'));
     }
     public function print_report(Request $request)
     {

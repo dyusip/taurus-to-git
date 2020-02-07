@@ -44,6 +44,8 @@ class RecReportController extends Controller
         $items = ReceivingHeader::whereBetween('rh_date', [$from, $to])->get();
         $data = array();
         $total =  0;
+        $tot_gross = 0;
+        $tot_disc = 0;
         foreach($items as $item){
             foreach($item->re_detail as $story) {
                 foreach($item->pod_detail as $key) {
@@ -52,6 +54,10 @@ class RecReportController extends Controller
                         $less = $key->prod_less;
                         $amount = ($price * $story->rd_prod_qty - (($price * $story->rd_prod_qty) * $less / 100));
                         $total += $amount;
+                        $gross_purch = $price * $story->rd_prod_qty;
+                        $disc = (($price * $story->rd_prod_qty) - $amount);
+                        $tot_gross += $gross_purch;
+                        $tot_disc += $disc;
                     }
                 }
                 $data[] = [
@@ -63,20 +69,29 @@ class RecReportController extends Controller
                     'NAME' => $story->rd_prod_name,
                     'QTY' => $story->rd_prod_qty,
                     'STATUS' => $story->rd_status,
-                    'PRICE' => Number_Format($price,2),
+                    'PRICE' => $price,
                     'LESS' => $less."%",
-                    'AMOUNT' => Number_Format($amount,2),
+                    //'AMOUNT' => Number_Format($amount,2),
+                    'GROSS PURCH' => $gross_purch,
+                    'DISCOUNT' => $disc,
+                    'NET PAYABLE' => $amount,
                 ];
             }
         }
 
-        return Excel::create('Taurus RecevingReport', function($excel) use ($data, $total) {
-            $excel->sheet('Receiving Report', function($sheet) use ($data, $total)
+        return Excel::create('Taurus RecevingReport', function($excel) use ($data, $total, $tot_gross, $tot_disc) {
+            $excel->sheet('Receiving Report', function($sheet) use ($data, $total, $tot_gross, $tot_disc)
             {
+                $sheet->setColumnFormat(array(
+                    'I' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'K' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'L' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'M' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                ));
                 $sheet->fromArray($data);
 
                 $sheet->prependRow(1, ["Taurus Receiving Report "]);
-                $sheet->mergeCells("A1:K1");
+                $sheet->mergeCells("A1:M1");
                 $sheet->cell('A1', function($cell) {
                     // change header color
                     $cell->setBackground('#3ed1f2')
@@ -87,11 +102,7 @@ class RecReportController extends Controller
                         ->setFontSize(13);;
                 });
                 $footerRow = count($data) + 3;
-                $sheet->appendRow("$footerRow",[
-                    'Total Amount: '.Number_Format($total,2)
-                ]);
-                $sheet->mergeCells("A{$footerRow}:K{$footerRow}");
-                $sheet->cell("A{$footerRow}", function($cell) {
+                $sheet->cell("A{$footerRow}:M{$footerRow}", function($cell) {
                     $cell->setBackground('#3ed1f2')
                         ->setAlignment('right')
                         ->setValignment('right')
@@ -99,6 +110,16 @@ class RecReportController extends Controller
                         //->setFontColor('#666666')
                         ->setFontSize(11);
                 });
+                $sheet->cell("K{$footerRow}", function($cell) use($tot_gross) {
+                    $cell->setValue($tot_gross);
+                });
+                $sheet->cell("L{$footerRow}", function($cell)use ($tot_disc) {
+                    $cell->setValue($tot_disc);
+                });
+                $sheet->cell("M{$footerRow}", function($cell) use($total) {
+                    $cell->setValue($total);
+                });
+
             });
         })->download('xlsx');
     }

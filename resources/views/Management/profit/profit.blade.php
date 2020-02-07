@@ -122,6 +122,7 @@
                                                 <th data-hide="phone" width="23%">NAME</th>
                                                 {{-- <th data-hide="phone" width="9%">CATEGORY</th>--}}
                                                 <th data-hide="phone,tablet" width="5%">COST</th>
+                                                <th data-hide="phone,tablet" width="5%">SRP</th>
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
                                                 <th data-hide="phone,tablet" width="5%">PRICE</th>
                                                 <th data-hide="phone" width="5%">LESS</th>
@@ -132,38 +133,39 @@
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">
                                             @if(isset($sales))
+                                                @php $total_cost = 0; @endphp
                                                 @php $total = 0; @endphp
                                                 @php $tot_profit = 0; @endphp
                                                 @foreach($sales as $sale)
-                                                    @foreach($sale->so_detail as $story)
-                                                        @php $profit = 0; @endphp
-                                                        @foreach($inventories as $inventory)
-                                                            @if($inventory->branch_code == $sale->branch_code)
-                                                                @php
-                                                                    $cost = $inventory->cost;
-                                                                    $tot_cost = $inventory->cost * $story->sod_prod_qty;
-                                                                    $profit = $story->sod_prod_amount - $tot_cost;
-                                                                @endphp
-                                                            @endif
-                                                        @endforeach
+                                                    @php
+                                                        $profit = $sale->total_amount - $sale->total_cost;
+                                                        $less = Number_Format($sale->less, 0);
+                                                        $branch = ($sale->branch=="")?'All Branch':$sale->branch;
+                                                    @endphp
                                                         <tr>
-                                                            <td>{{ $sale->so_branch->name }}</td>
-                                                            <td>{{ $story->sod_prod_code}}</td>
-                                                            <td>{{ $story->sod_prod_name}}</td>
-                                                            <td>{{ $cost }}</td>
-                                                            <td>{{ $story->sod_prod_qty}}</td>
-                                                            <td>{{ $story->sod_prod_price}}</td>
-                                                            <td>{{ $story->sod_less}}</td>
-                                                            <td>{{ $tot_cost}}</td>
-                                                            <td>{{ $story->sod_prod_amount}}</td>
-                                                            <td>{{ $profit }}</td>
+                                                            <td>{{ $branch }}</td>
+                                                            <td>{{ $sale->sod_prod_code }}</td>
+                                                            <td>{{ $sale->sod_prod_name }}</td>
+                                                            <td>{!! Number_Format($sale->cost,2) !!}</td>
+                                                            <td>{!! Number_Format($sale->srp,2) !!}</td>
+                                                            <td>{{ $sale->total_qty}}</td>
+                                                            <td>{!! Number_Format($sale->price,2) !!}</td>
+                                                            <td>{{ $less }}</td>
+                                                            <td>{!! Number_Format($sale->total_cost,2) !!}</td>
+                                                            <td>{!! Number_Format($sale->total_amount,2) !!}</td>
+                                                            <td>{!! Number_Format($profit,2) !!}</td>
                                                         </tr>
                                                         @php
-                                                            $total += $story->sod_prod_amount;
+                                                            $total_cost += $sale->total_cost;
+                                                            $total += $sale->total_amount;
                                                             $tot_profit += $profit;
                                                         @endphp
-                                                    @endforeach
                                                 @endforeach
+                                                @php
+                                                    $total_cost = Number_Format(@$total_cost,2);
+                                                    $total = Number_Format(@$total,2);
+                                                    $tot_profit = Number_Format(@$tot_profit,2);
+                                                @endphp
                                             @endif
                                             </tbody>
                                             <tr>
@@ -176,6 +178,7 @@
                                                 <td style="display: none;"></td>
                                                 <td style="display: none;"></td>
                                                 <th class="text-right" colspan="8">TOTAL AMOUNT</th>
+                                                <th>{{ @$total_cost }}</th>
                                                 <th>{{ @$total }}</th>
                                                 <th>{{ @$tot_profit }}</th>
                                             </tr>

@@ -5,50 +5,37 @@
         </div>
         <a class='navbar-brand' href='{{url('login')}}'><!--<img src="../infoLogo.png" height='28' width='250'/>--><img src="../../img/tinuod.gif" style="height: 100%"/></a>
         <ul class="nav navbar-top-links navbar-right">
-            {{--<li class="dropdown">
+            <li class="dropdown">
                 <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                    <i class="fa fa-bell"></i>  <span class="label label-primary">{{$notify}}</span>
+                    <i class="fa fa-bell"></i>  <span class="label label-primary">{{ $pm_count }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-alerts">
 
-                   --}}{{-- @foreach($notify_data as $data)--}}{{--
-                        <li>
-                            <a href="/notification/po--}}{{--{{$data->po_code}}--}}{{--">
-                                <div>
-                                    <i class="fa fa-cogs fa-fw"></i> Puchase Order <span class="label label-info">{{$po_count}}</span>--}}{{--{{$data->po_code ." - ". $data->sup_name }}--}}{{--
-                                    <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="/notification/transfer--}}{{--{{$data->po_code}}--}}{{--">
-                                <div>
-                                    <i class="fa fa-cog fa-fw"></i> Transfer Item <span class="label label-warning-light" style="margin-left: 3%">{{$tf_count}}</span> --}}{{--{{$data->po_code ." - ". $data->sup_name }}--}}{{--
-                                    <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
-                                </div>
-                            </a>
-                        </li>
-                    --}}{{--@endforeach--}}{{--
-                    --}}{{--<li>
-                        <a href="profile.html">
-                            <div>
-                                <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                <span class="pull-right text-muted small">12 minutes ago</span>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="divider"></li>
+                    {{-- @foreach($notify_data as $data)--}}
                     <li>
-                        <a href="grid_options.html">
+                        <a href="/request_item/request{{--{{$data->po_code}}--}}">
                             <div>
-                                <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                <span class="pull-right text-muted small">4 minutes ago</span>
+                                <i class="fa fa-cogs fa-fw"></i> Request Item <span class="label label-info">{{ $req_count }}</span>{{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
                             </div>
                         </a>
                     </li>
-                    <li class="divider"></li>--}}{{--
-
+                    <li>
+                        <a href="/view_po/{{--{{$data->po_code}}--}}">
+                            <div>
+                                <i class="fa fa-cog fa-fw"></i> Purchase Order <span class="label label-warning-light">{{ $app_po }}</span>{{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/notification/transfer{{--{{$data->po_code}}--}}">
+                            <div>
+                                <i class="fa fa-cog fa-fw"></i> Transfer Item <span class="label label-warning-light" style="margin-left: 3%">{{$transfer_user}}</span> {{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
+                            </div>
+                        </a>
+                    </li>
 
                     <li>
                         <div class="text-center link-block">
@@ -60,7 +47,6 @@
                     </li>
                 </ul>
             </li>
---}}
 
             <li class="dropdown">
 

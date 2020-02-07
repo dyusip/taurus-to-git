@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\SalesReport;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\SoHeader;
@@ -31,7 +31,7 @@ class SalesReportController extends Controller
     {
         $branches = Branch::where(['status'=>'AC'])->get();
 
-        return view($this->position().'.sales_report.sales',compact('branches'));
+        return view($this->position().'.new_reports.sales',compact('branches'));
     }
     public function show(Request $request)
     {
@@ -43,7 +43,7 @@ class SalesReportController extends Controller
             $sales = SoHeader::where(['branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])->get();
         }
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.sales_report.sales',compact('sales','request', 'branches'));
+        return view($this->position().'.new_reports.sales',compact('sales','request', 'branches'));
     }
     public function print_report(Request $request)
     {
@@ -54,30 +54,32 @@ class SalesReportController extends Controller
             if ($request->optCustType == "all") {
                 $sales = SoHeader::whereBetween('so_date', [$from, $to])
                     ->join('so_details as sod', 'sod.sod_code', '=', 'so_code')
-                    ->join('branch__inventories as bri', function ($join) use ($from) {
+                    /*->join('branch__inventories as bri', function ($join) use ($from) {
                         $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
                         //$join->on('bri.branch_code','=','to_branch');
                         $join->on('bri.branch_code', '=', 'so_headers.branch_code');
-                    })
-                    ->select(DB::raw('so_headers.branch_code,bri.cost, bri.price,
-                    so_code,jo_code,so_date,sod_prod_code,sod_prod_name,cost,sod_prod_qty,sod_prod_price,sod_less,sod_prod_amount'))
+                    })*/
+                    ->select(DB::raw('so_headers.branch_code,sod_prod_cost, sod_prod_srp,
+                    so_code,jo_code,so_date,sod_prod_code,sod_prod_name,sod_prod_qty,sod_prod_price,sod_less,sod_prod_amount'))
                     ->groupBy('branch_code', 'so_code', 'jo_code', 'so_date', 'sod_prod_code', 'sod_prod_name'
-                        , 'cost', 'price', 'sod_prod_qty', 'sod_prod_price', 'sod_less', 'sod_prod_amount')
+                        , 'sod_prod_cost', 'sod_prod_srp ', 'sod_prod_qty', 'sod_prod_price', 'sod_less', 'sod_prod_amount')
                     ->get();
+                $br = "ALL BRANCH";
             } elseif ($request->optCustType == "branch") {
                 //$sales = SoHeader::where(['branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])->get();
                 $sales = SoHeader::where(['so_headers.branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])
                     ->join('so_details as sod', 'sod.sod_code', '=', 'so_code')
-                    ->join('branch__inventories as bri', function ($join) use ($from) {
+                    /*->join('branch__inventories as bri', function ($join) use ($from) {
                         $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
                         //$join->on('bri.branch_code','=','to_branch');
                         $join->on('bri.branch_code', '=', 'so_headers.branch_code');
-                    })
-                    ->select(DB::raw('so_headers.branch_code,bri.cost, bri.price,
-                    so_code,jo_code,so_date,sod_prod_code,sod_prod_name,cost,sod_prod_qty,sod_prod_price,sod_less,sod_prod_amount'))
+                    })*/
+                    ->select(DB::raw('so_headers.branch_code,sod_prod_cost, sod_prod_srp,
+                    so_code,jo_code,so_date,sod_prod_code,sod_prod_name,sod_prod_qty,sod_prod_price,sod_less,sod_prod_amount'))
                     ->groupBy('branch_code', 'so_code', 'jo_code', 'so_date', 'sod_prod_code', 'sod_prod_name'
-                        , 'cost', 'price', 'sod_prod_qty', 'sod_prod_price', 'sod_less', 'sod_prod_amount')
+                        , 'sod_prod_cost', 'sod_prod_srp', 'sod_prod_qty', 'sod_prod_price', 'sod_less', 'sod_prod_amount')
                     ->get();
+                $br = Branch::where(['code' => @$request->branch])->first()->name." BRANCH";
             }
             $data = array();
             $total = 0;
@@ -89,19 +91,19 @@ class SalesReportController extends Controller
                     'DATE' => $sale->so_date,
                     'ITEM CODE' => $sale->sod_prod_code,
                     'NAME' => $sale->sod_prod_name,
-                    'COST' => $sale->cost,
-                    'SRP' => $sale->price,
+                    'COST' => $sale->sod_prod_cost,
+                    'SRP' => $sale->sod_prod_srp,
                     'QTY' => $sale->sod_prod_qty,
-                    'PRICE' => $sale->sod_prod_price,
+                    'SALES PRICE' => $sale->sod_prod_price,
                     'LESS' => $sale->sod_less,
-                    'AMOUNT' => $sale->sod_prod_amount,
+                    'TOTAL SALES' => $sale->sod_prod_amount,
                 ];
                 $total += $sale->sod_prod_amount;
             }
 
-            return Excel::create('Taurus SalesReport', function ($excel) use ($data, $total) {
+            return Excel::create('Taurus SalesReport', function ($excel) use ($data, $total, $br, $from, $to) {
                 $excel->setTitle('Taurus Sales Report');
-                $excel->sheet('Sales Report', function ($sheet) use ($data, $total) {
+                $excel->sheet('Sales Report', function ($sheet) use ($data, $total, $br, $from, $to) {
                     $sheet->setColumnFormat(array(
                         /*'H' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
                         'J' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,*/
@@ -112,7 +114,7 @@ class SalesReportController extends Controller
                     ));
                     $sheet->fromArray($data);
 
-                    $sheet->prependRow(1, ["Taurus Sales Report "]);
+                    $sheet->prependRow(1, ["Taurus Sales Report $br $from - $to"]);
                     $sheet->mergeCells("A1:L1");
                     $sheet->cell('A1', function ($cell) {
                         // change header color

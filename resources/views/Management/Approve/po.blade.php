@@ -73,7 +73,7 @@
                                                 <select required name="PONo" id="po_code" class="form-control select2_demo_1">
                                                     <option></option>
                                                     @foreach($pos as $key)
-                                                        <option value="{{ $key->po_code }}">{{ $key->po_code ." - ". $key->sup_name }}</option>
+                                                        <option value="{{ $key->po_code }}">{{ $key->po_code ." - ". $key->supplier->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -248,6 +248,22 @@
     @endif
     $(document).ready(function() {
         datatable();
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "progressBar": true,
+            "preventDuplicates": true,
+            "positionClass": "toast-top-right",
+            "onclick": null,
+            "showDuration": "400",
+            "hideDuration": "1000",
+            "timeOut": "7000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
     });
     function datatable() {
         $('#dataTables-example').DataTable({
@@ -306,38 +322,46 @@
     $(document).on('change', '#po_code', function (e) {
         e.preventDefault();
         var po_code = $(this).val();
-        $.ajax({
-            url: po_code,
-            beforeSend: function() {
-                $('#main-spinner').fadeIn();
-            },
-            success: function (output) {
-                var data = jQuery.parseJSON(output);
-                $('#sup_address').val(data.header.sup_add);
-                $('#sup_contact').val(data.header.sup_contact);
-                $('#reqDate').val(data.header.po_date);
-                $('#term').val(data.header.term);
-                $('#totalAmount').val(data.header.total);
-                $('#main-spinner').fadeOut();
-                $('tbody').html('');
-                if ($.fn.dataTable.isDataTable('#dataTables-example')) {
-                    $('#dataTables-example').DataTable().clear().destroy();
-                }
-                $.each(data.detail, function (index, value) {
-                    $('tbody').append("<tr> " +
-                        "<td>"+ value.prod_code +"</td> " +
-                        "<td>"+ value.prod_name +"</td> " +
-                        "<td>"+ value.prod_uom +"</td> " +
-                        "<td>"+ value.prod_qty +"</td> " +
-                        "<td>"+ value.prod_price +"</td> " +
-                        "<td>"+ value.prod_less +"%</td> " +
-                        "<td>"+ value.prod_amount +"</td> " +
-                        "</tr>");
-                });
-                datatable();
+        $('#main-spinner').fadeIn();
+        if(po_code == ""){
+            $("input[type=text]").val('');
+            $('#dataTables-example').DataTable().clear().destroy();
+            datatable();
+            $('#main-spinner').fadeOut();
+        }else{
+            $.ajax({
+                url: po_code,
+                beforeSend: function() {
+                    $('#main-spinner').fadeIn();
+                },
+                success: function (output) {
+                    var data = jQuery.parseJSON(output);
+                    $('#sup_address').val(data.supplier.address);
+                    $('#sup_contact').val(data.supplier.contact);
+                    $('#reqDate').val(data.header.po_date);
+                    $('#term').val(data.header.term);
+                    $('#totalAmount').val(data.header.total);
+                    $('#main-spinner').fadeOut();
+                    $('tbody').html('');
+                    if ($.fn.dataTable.isDataTable('#dataTables-example')) {
+                        $('#dataTables-example').DataTable().clear().destroy();
+                    }
+                    $.each(data.detail, function (index, value) {
+                        $('tbody').append("<tr> " +
+                            "<td>"+ value.prod_code +"</td> " +
+                            "<td>"+ value.prod_name +"</td> " +
+                            "<td>"+ value.prod_uom +"</td> " +
+                            "<td>"+ value.prod_qty +"</td> " +
+                            "<td>"+ value.prod_price +"</td> " +
+                            "<td>"+ value.prod_less +"%</td> " +
+                            "<td>"+ value.prod_amount +"</td> " +
+                            "</tr>");
+                    });
+                    datatable();
 
-            }
-        });
+                }
+            });
+        }
     });
 </script>
 @endpush

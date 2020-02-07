@@ -121,6 +121,24 @@
                                                     </span>
                                                 @endif
                                             </div>
+                                            <div class="form-group {{ $errors->has('cost') ? ' has-error' : '' }}" id="div-cost">
+                                                <label>Cost</label>
+                                                <input type="text" autocomplete="off" placeholder="Cost" value="{{ old('cost') }}" name="cost" id="cost" required class="form-control">
+                                                @if ($errors->has('cost'))
+                                                    <span class="help-block">
+                                                        <strong>{{ $errors->first('cost') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="form-group {{ $errors->has('price') ? ' has-error' : '' }}" id="div-price">
+                                                <label>Price</label>
+                                                <input type="text" autocomplete="off" placeholder="Price" value="{{ old('price') }}" name="price" id="price" required class="form-control">
+                                                @if ($errors->has('price'))
+                                                    <span class="help-block">
+                                                        <strong>{{ $errors->first('price') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
                                                 <button class="btn btn-sm btn-primary ladda-button ladda-button-demo btn-block" data-style="zoom-in" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
@@ -139,7 +157,87 @@
                     </div>
                     <div class="col-lg-8">
                         <div class="ibox float-e-margins">
-                            <div class="ibox-content">
+                            <div class="tabs-container">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-active"> Active Item</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-inactive"> Inactive Item</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                        <div id="tab-active" class="tab-pane active">
+                                            <div class="panel-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-bordered table-hover" id="dataTables-example" width="100%">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Code</th>
+                                                            <th>Name</th>
+                                                            <th>Desc</th>
+                                                            <th>UOM</th>
+                                                            {{-- <th>Pack-Qty</th>--}}
+                                                            <th class="text-center">Status</th>
+                                                            <th class="text-center">Action</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {{--@foreach($inventories as $inventory)
+                                                            <tr>
+                                                                <td>{{ $inventory->code }}</td>
+                                                                <td>{{ $inventory->name }}</td>
+                                                                <td>{{ $inventory->desc }}</td>
+                                                                <td>{{ $inventory->uom }}</td>
+                                                                --}}{{--<td>{{ $inventory->pqty }}</td>--}}{{--
+                                                                <td class="text-center">{{ $inventory->status }}</td>
+                                                                <td class="text-center">
+                                                                    <a href="#" class="text-success" id="btn-edit"  data-id="{{ $inventory->id }}"><i class="fa fa-edit"></i></a>
+                                                                    <a href="#modal-br-status" class="text-danger" id="btn-delete" data-id="{{ $inventory->id }}" data-toggle="modal"><i class="fa fa-remove"></i></a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach--}}
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <div id="tab-inactive" class="tab-pane">
+                                        <div class="panel-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-bordered table-hover" id="dataTables-inactive" width="100%">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Code</th>
+                                                        <th>Name</th>
+                                                        <th>Desc</th>
+                                                        <th>UOM</th>
+                                                        {{-- <th>Pack-Qty</th>--}}
+                                                        <th class="text-center">Status</th>
+                                                        <th class="text-center">Action</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {{--@foreach($inventories as $inventory)
+                                                        <tr>
+                                                            <td>{{ $inventory->code }}</td>
+                                                            <td>{{ $inventory->name }}</td>
+                                                            <td>{{ $inventory->desc }}</td>
+                                                            <td>{{ $inventory->uom }}</td>
+                                                            --}}{{--<td>{{ $inventory->pqty }}</td>--}}{{--
+                                                            <td class="text-center">{{ $inventory->status }}</td>
+                                                            <td class="text-center">
+                                                                <a href="#" class="text-success" id="btn-edit"  data-id="{{ $inventory->id }}"><i class="fa fa-edit"></i></a>
+                                                                <a href="#modal-br-status" class="text-danger" id="btn-delete" data-id="{{ $inventory->id }}" data-toggle="modal"><i class="fa fa-remove"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach--}}
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{--<div class="ibox-content">--}}
                                 <!--Employee Settings-->
                                 <div class="modal inmodal" id="modal-br-status" tabindex="-1" role="dialog"  aria-hidden="true">
                                     <div class="modal-dialog">
@@ -165,39 +263,8 @@
                                     </div>
                                 </div>
                                 <!--Employee Settings-->
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered table-hover" id="dataTables-example">
-                                        <thead>
-                                        <tr>
-                                            <th>Code</th>
-                                            <th>Name</th>
-                                            <th>Desc</th>
-                                            <th>UOM</th>
-                                           {{-- <th>Pack-Qty</th>--}}
-                                            <th class="text-center">Status</th>
-                                            <th class="text-center">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {{--@foreach($inventories as $inventory)
-                                            <tr>
-                                                <td>{{ $inventory->code }}</td>
-                                                <td>{{ $inventory->name }}</td>
-                                                <td>{{ $inventory->desc }}</td>
-                                                <td>{{ $inventory->uom }}</td>
-                                                --}}{{--<td>{{ $inventory->pqty }}</td>--}}{{--
-                                                <td class="text-center">{{ $inventory->status }}</td>
-                                                <td class="text-center">
-                                                    <a href="#" class="text-success" id="btn-edit"  data-id="{{ $inventory->id }}"><i class="fa fa-edit"></i></a>
-                                                    <a href="#modal-br-status" class="text-danger" id="btn-delete" data-id="{{ $inventory->id }}" data-toggle="modal"><i class="fa fa-remove"></i></a>
-                                                </td>
-                                            </tr>
-                                        @endforeach--}}
-                                        </tbody>
 
-                                    </table>
-                                </div>
-                            </div>
+                           {{-- </div>--}}
                         </div>
                     </div>
                 </div>
@@ -406,19 +473,46 @@
              { "data": 14 },
              ]*/
         });
+        $('#dataTables-inactive').DataTable({
+            'processing': true,
+            'serverSide': true,
+            'ajax': 'show/inactive',
+            'columns': [
+                {data: 1, name: 'code'},
+                {data: 2, name: 'name'},
+                {data: 3, name: 'desc'},
+                {data: 4, name: 'uom'},
+                {data: 6, name: 'status'},
+                {data: 9, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
+            ]
+            /* "columns": [
+             { "data": 1 },
+             { "data": 9 },
+             { "data": 3 },
+             { "data": 4 },
+             { "data": 2 },
+             { "data": 14 },
+             ]*/
+        });
         $(document).on('click','#btn-edit',function () {
             var id = $(this).data('id');
             $(".overlay").show();
             $.get(id+"/edit", function (data) {
                 $('.overlay').fadeOut();
-                $('#name').val(data.name);
-                $('#desc').val(data.desc);
-                $('#uom').val(data.uom);
-                $('#pqty').val(data.pqty);
-                $('#form-inventory').attr('action','/inventory/'+data.id);
+                $('#name').val(data.inventory.name);
+                $('#desc').val(data.inventory.desc);
+                $('#uom').val(data.inventory.uom);
+                $('#pqty').val(data.inventory.pqty);
+                $('#cost').val(data.branch_inv.cost);
+                $('#price').val(data.branch_inv.price);
+                $('#form-inventory').attr('action','/inventory/'+data.inventory.id);
                 $('#_method').removeAttr('disabled');
                 $('#register').html('Update Inventory');
                 $('#code').attr('disabled',true);
+                /*$('#cost').attr('disabled',true);
+                $('#price').attr('disabled',true);*/
+                //$('#div-cost').hide();
+                //$('#div-price').hide();
             });
 
         });

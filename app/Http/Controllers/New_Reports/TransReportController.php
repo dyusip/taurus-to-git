@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TransReport;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\Branch_Inventory;
@@ -33,7 +33,7 @@ class TransReportController extends Controller
     public function index()
     {
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.transfer_report.transfer',compact('branches'));
+        return view($this->position().'.new_reports.transfer',compact('branches'));
     }
     public function show(Request $request)
     {
@@ -46,16 +46,16 @@ class TransReportController extends Controller
             })*/
             $items = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where(['from_branch' => 'TR-BR00001'])->where('to_branch','!=','TR-BR00001')
-                ->select(DB::raw('bri.cost as tf_prod_price, bri.price as srp, tf_code,tf_dt.tf_prod_code, tf_date,
+                ->select(DB::raw('tf_prod_price, tf_prod_srp as srp, tf_code,tf_dt.tf_prod_code, tf_date,
                 tf_dt.tf_prod_name,tf_dt.tf_prod_qty, fr_branch.name as from_branch, to_branch.name as to_branch,
-                (bri.cost * tf_dt.tf_prod_qty) as tf_prod_amount'))
+                (tf_prod_price * tf_dt.tf_prod_qty) as tf_prod_amount'))
                 ->join('transfer_details as tf_dt','tf_code','=','tf_dt.td_code')
                 ->join('branches as fr_branch','fr_branch.code','=','from_branch')
                 ->join('branches as to_branch','to_branch.code','=','to_branch')
-                ->join('branch__inventories as bri', function ($join) use($from) {
+               /* ->join('branch__inventories as bri', function ($join) use($from) {
                     $join->on('bri.prod_code', '=', 'tf_prod_code');
                     $join->on('bri.branch_code','=','from_branch');
-                })
+                })*/
                 ->get();
         }elseif($request->optCustType == "branch") {
             /*$items = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
@@ -69,16 +69,16 @@ class TransReportController extends Controller
                         ->orWhere(['to_branch' => $request->branch]);
                 })*/
                 ->where(['from_branch' => 'TR-BR00001'])->where('to_branch','=',$request->branch)
-                ->select(DB::raw('bri.cost as tf_prod_price, bri.price as srp, tf_code,tf_dt.tf_prod_code, tf_date,
+                ->select(DB::raw('tf_prod_price, tf_prod_srp as srp, tf_code,tf_dt.tf_prod_code, tf_date,
                 tf_dt.tf_prod_name,tf_dt.tf_prod_qty, fr_branch.name as from_branch, to_branch.name as to_branch,
-                (bri.cost * tf_dt.tf_prod_qty) as tf_prod_amount'))
+                (tf_prod_price * tf_dt.tf_prod_qty) as tf_prod_amount'))
                 ->join('transfer_details as tf_dt','tf_code','=','tf_dt.td_code')
                 ->join('branches as fr_branch','fr_branch.code','=','from_branch')
                 ->join('branches as to_branch','to_branch.code','=','to_branch')
-                ->join('branch__inventories as bri', function ($join) use($from) {
+                /*->join('branch__inventories as bri', function ($join) use($from) {
                     $join->on('bri.prod_code', '=', 'tf_prod_code');
                     $join->on('bri.branch_code','=','from_branch');
-                })
+                })*/
                 ->get();
             /*$tf = TransferHeaders::where(['to_branch' => $request->branch, 'tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->join('transfer_details as tf_dt', 'tf_dt.td_code', '=', 'tf_code')
@@ -152,7 +152,7 @@ class TransReportController extends Controller
 
         }
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.transfer_report.transfer',compact('items','request', 'branches'));
+        return view($this->position().'.new_reports.transfer',compact('items','request', 'branches'));
     }
     public function print_report(Request $request)
     {
@@ -163,9 +163,9 @@ class TransReportController extends Controller
             //$items = TransferHeaders::whereBetween('tf_date', [$from, $to])->get(); //Original
             $items = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where(['from_branch' => 'TR-BR00001'])->where('to_branch','!=','TR-BR00001')
-                ->select(DB::raw('bri.cost as tf_prod_price, bri.price as srp, tf_code,tf_dt.tf_prod_code, tf_date,
+                ->select(DB::raw('tf_prod_price, tf_prod_srp as srp, tf_code,tf_dt.tf_prod_code, tf_date,
                 tf_dt.tf_prod_name,tf_dt.tf_prod_qty, fr_branch.name as from_branch, to_branch.name as to_branch,
-                (bri.cost * tf_dt.tf_prod_qty) as tf_prod_amount'))
+                (tf_prod_price * tf_dt.tf_prod_qty) as tf_prod_amount'))
                 ->join('transfer_details as tf_dt','tf_code','=','tf_dt.td_code')
                 ->join('branches as fr_branch','fr_branch.code','=','from_branch')
                 ->join('branches as to_branch','to_branch.code','=','to_branch')
@@ -174,6 +174,7 @@ class TransReportController extends Controller
                     $join->on('bri.branch_code','=','from_branch');
                 })
                 ->get();
+            $br = "ALL BRANCH";
         }elseif($request->optCustType == "branch"){
             //$items = TransferHeaders::where(['to_branch' => $request->branch])->orWhere(['from_branch' => Auth::user()->branch])->whereBetween('tf_date', [$from, $to])->get(); //Original
             $items = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
@@ -182,9 +183,9 @@ class TransReportController extends Controller
                         ->orWhere(['to_branch' => $request->branch]);
                 })*/
                 ->where(['from_branch' => 'TR-BR00001'])->where('to_branch','=',$request->branch)
-                ->select(DB::raw('bri.cost as tf_prod_price, bri.price as srp, tf_code,tf_dt.tf_prod_code, tf_date,
+                ->select(DB::raw('tf_prod_price, tf_prod_srp as srp, tf_code,tf_dt.tf_prod_code, tf_date,
                 tf_dt.tf_prod_name,tf_dt.tf_prod_qty, fr_branch.name as from_branch, to_branch.name as to_branch,
-                (bri.cost * tf_dt.tf_prod_qty) as tf_prod_amount'))
+                (tf_prod_price * tf_dt.tf_prod_qty) as tf_prod_amount'))
                 ->join('transfer_details as tf_dt','tf_code','=','tf_dt.td_code')
                 ->join('branches as fr_branch','fr_branch.code','=','from_branch')
                 ->join('branches as to_branch','to_branch.code','=','to_branch')
@@ -193,6 +194,7 @@ class TransReportController extends Controller
                     $join->on('bri.branch_code','=','from_branch');
                 })
                 ->get();
+            $br = Branch::where(['code' => @$request->branch])->first()->name." BRANCH";
         }
         $data = array();
         $total =  0;
@@ -258,15 +260,15 @@ class TransReportController extends Controller
                     'NAME' => $item->tf_prod_name,
                     'COST' => $item->tf_prod_price,
                     'QTY' => $item->tf_prod_qty,
-                    'SRP' => $item->srp ,
-                    'COST AMOUNT' => $item->tf_prod_amount,
+                    'SRP' => $item->srp,
+                    'TOTAL COST' => $item->tf_prod_amount,
 
                 ];
                 $total += $item->tf_prod_amount;
         }
-        return Excel::create('Taurus CW Deliveries Report', function($excel) use ($data, $total) {
+        return Excel::create('Taurus CW Deliveries Report', function($excel) use ($data, $total, $br, $from, $to) {
             $excel->setTitle('Taurus CW Deliveries Report');
-            $excel->sheet('CW Deliveries Report', function($sheet) use ($data, $total)
+            $excel->sheet('CW Deliveries Report', function($sheet) use ($data, $total, $br, $from, $to)
             {
                 $sheet->setColumnFormat(array(
                     'G' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
@@ -275,7 +277,7 @@ class TransReportController extends Controller
                 ));
                 $sheet->fromArray($data);
 
-                $sheet->prependRow(1, ["Taurus CW Deliveries Report "]);
+                $sheet->prependRow(1, ["Taurus CW Deliveries Report $br $from - $to"]);
                 $sheet->mergeCells("A1:J1");
                 $sheet->cell('A1', function($cell) {
                     // change header color

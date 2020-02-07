@@ -26,13 +26,13 @@
         </div>
         <div class="col-md-6">
             <div class="ibox-content">
-                <div><img src='/img/tinuod.gif' style="height: 58px;" class='cannot-select'/></div>
+                <div><img src='/img/tinuod.gif' style="height: 58px;" class='cannot-select img-responsive'/></div>
                 <br><br>
 
                 <form class="m-t" role="form" action="{{ route('login') }}" method="post">
                     {{csrf_field()}}
                     <div class="form-group {{ $errors->has('username') ? ' has-error' : '' }}">
-                        <input type="text" class="form-control" name="username" placeholder="Username" >
+                        <input type="text" required class="form-control" name="username" placeholder="Username" >
                         @if ($errors->has('username'))
                             <span class="help-block">
                                         <strong>{{ $errors->first('username') }}</strong>
@@ -40,7 +40,7 @@
                         @endif
                     </div>
                     <div class="form-group {{ $errors->has('password') ? ' has-error' : '' }}">
-                        <input type="password" class="form-control" name="password" placeholder="Password">
+                        <input type="password" required class="form-control" name="password" placeholder="Password">
                         @if ($errors->has('password'))
                             <span class="help-block">
                                         <strong>{{ $errors->first('password') }}</strong>

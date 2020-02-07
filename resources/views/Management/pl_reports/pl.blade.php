@@ -2,9 +2,9 @@
 
 @section('index-content')
     <div id="wrapper">
-        @include('Purchasing.sidebar')
+        @include('Management.sidebar')
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Purchasing.header')
+            @include('Management.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>Taurus Picklist Report</h2>

@@ -7,6 +7,7 @@ use App\SoDetail;
 use App\SoHeader;
 use App\SrHeader;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Activity;
 
@@ -36,7 +37,7 @@ class SR_Controller extends Controller
             $num = SrHeader::max('sr_code');
             ++$num;
         }
-        $sos = SoHeader::all();
+        $sos = SoHeader::where(['branch_code' => Auth::user()->branch])->get();
         return view('Salesman.sr.create',compact('sos','num'));
     }
 
@@ -64,14 +65,24 @@ class SR_Controller extends Controller
                 'srd_less' => $request->less[$item],
                 'srd_prod_amount' => $request->amount[$item],
                 'status' => $request->status[$item],
+                'srd_prod_cost' => $request->prod_cost[$item],
+                'srd_prod_srp' => $request->prod_srp[$item],
             ]);
             $so_detail = SoDetail::where(['sod_prod_code' => $request->prod_code[$item], 'sod_code' => $request->so_code]);
             $so_detail->update(['sod_prod_qty' => DB::raw('sod_prod_qty - ' . $request->qty[$item])]);
+            $new_qty = $so_detail->first()->sod_prod_qty;
+            $sod_amount = ($new_qty * $request->price[$item] - (($new_qty * $request->price[$item]) * ($request->less[$item]/100)));
+            SoDetail::where(['sod_prod_code' => $request->prod_code[$item], 'sod_code' => $request->so_code])
+                ->update(['sod_prod_amount' => $sod_amount]);
             if($request->status[$item]=='SR') {
                 $inventory = Branch_Inventory::where(['prod_code' => $request->prod_code[$item], 'branch_code' => $request->branch_code]);
                 $inventory->update(['quantity' => DB::raw('quantity + ' . $request->qty[$item])]);
             }
         }
+        $amount = SoDetail::where(['sod_code' => $request->so_code])
+            ->select(DB::raw('SUM(sod_prod_price * sod_prod_qty) as total_amount'))
+            ->groupBy('sod_code')->first();
+        SoHeader::where(['so_code' => $request->so_code])->update(['so_amount' => $amount->total_amount]);
         Activity::log("Returned SO # $request->so_code", Auth::user()->id);
         return redirect('/sr/create')->with('status', "SO# ".strtoupper($request->so_code)." successfully returned.");
     }
@@ -91,7 +102,8 @@ class SR_Controller extends Controller
             // Load the relation
             $mechanic = $so->mechanic->name;
         }
-        return json_encode(['header' => $so, 'detail' => $so->so_detail, 'salesman' => $so->salesman->name, 'mechanic' => $mechanic]);
+        $salesman = (!is_null($so->salesman))?$so->salesman->name:null;
+        return json_encode(['header' => $so, 'detail' => $so->so_detail, 'salesman' => $salesman, 'mechanic' => $mechanic]);
     }
 
     /**

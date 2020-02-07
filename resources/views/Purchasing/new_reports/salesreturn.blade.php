@@ -2,9 +2,9 @@
 
 @section('index-content')
     <div id="wrapper">
-        @include('Management.sidebar')
+        @include('Purchasing.sidebar')
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Management.header')
+            @include('Purchasing.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>Taurus New Sales Return Report</h2>
@@ -125,9 +125,9 @@
                                                 <th data-hide="phone" width="23%">NAME</th>
                                                 {{-- <th data-hide="phone" width="9%">CATEGORY</th>--}}
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
-                                                <th data-hide="phone,tablet" width="5%">PRICE</th>
+                                                <th data-hide="phone,tablet" width="5%">SALES RETURN PRICE</th>
                                                 <th data-hide="phone" width="5%">LESS</th>
-                                                <th class="text-center" width="8%">AMOUNT</th>
+                                                <th class="text-center" width="8%">TOTAL SALES RETURN</th>
                                             </tr>
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">

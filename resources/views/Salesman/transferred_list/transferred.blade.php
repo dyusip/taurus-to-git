@@ -47,7 +47,7 @@
                                             <th data-hide="phone" width="13%">TO</th>
                                             <th data-hide="phone" width="15%">DATE</th>
                                             <th data-hide="phone" width="15%">PREPARED BY</th>
-                                            <th data-hide="phone" width="15%">APPROVED BY</th>
+                                            {{--<th data-hide="phone" width="15%">APPROVED BY</th>--}}
                                             <th class="text-center" width="8%">ACTION</th>
                                         </tr>
                                         </thead>
@@ -94,12 +94,12 @@
         'ajax': '/transferred/list/{{ Auth::user()->branch }}',
         'columns': [
             {data: 1, name: 'transfer_headers.tf_code'},
-            {data: 11+'.name', name: 'tf_fr_branch.name'},
-            {data: 12+'.name', name: 'tf_to_branch.name'},
-            {data: 4, name: 'transfer_headers.tf_date'},
-            {data: 13+'.name', name: 'tf_prep_by.name'},
-            {data: 14+'.name', name: 'tf_app_by.name'},
-            {data: 15, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
+            {data: 12+'.name', name: 'tf_fr_branch.name'},
+            {data: 13+'.name', name: 'tf_to_branch.name'},
+            {data: 5, name: 'transfer_headers.tf_date'},
+            {data: 14+'.name', name: 'tf_prep_by.name'},
+           /* {data: 15+'.name', name: 'tf_app_by.name'},*/
+            {data: 16, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
             {{--{!! $branch->code==Auth::user()->branch?"{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}":''  !!}--}}
         ],
         "order": [[3, 'desc']]

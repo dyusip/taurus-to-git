@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Profit;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\Branch_Inventory;
@@ -33,7 +33,7 @@ class ProfitController extends Controller
     {
         $branches = Branch::where(['status'=>'AC'])->get();
 
-        return view($this->position().'.profit.profit',compact('branches'));
+        return view($this->position().'.new_reports.profit',compact('branches'));
     }
     public function show(Request $request)
     {
@@ -64,17 +64,17 @@ class ProfitController extends Controller
             $sales = SoDetail::whereHas('so_header',function ($query) use($from, $to){
                 $query->whereBetween('so_date', [$from, $to]);
             })->select(DB::raw('sod_prod_code,sod_prod_name, sum(sod_prod_qty) as total_qty, 
-                    AVG(sod_less) as less, AVG(bri.cost) as cost, AVG(bri.price) as srp,
+                    AVG(sod_less) as less, AVG(sod_prod_cost) as cost, AVG(sod_prod_srp) as srp,
                     SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) / sum(sod_prod_qty) as price, 
-                    SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_amount, SUM(bri.cost * sod_prod_qty) as total_cost'))
+                    SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_amount, SUM(sod_prod_cost * sod_prod_qty) as total_cost'))
                 ->groupBy('sod_prod_code','sod_prod_name')
                 //->join('branch__inventories as bri','sod_prod_code','=','bri.prod_code')
                 ->join('so_headers as soh','soh.so_code','=','sod_code')
-                ->join('branch__inventories as bri', function ($join) {
+                /*->join('branch__inventories as bri', function ($join) {
                     $join->on('bri.prod_code', '=', 'sod_prod_code');
                     $join->on('bri.branch_code','=','soh.branch_code');
 
-                })
+                })*/
                 ->get();
 
             /*->count([
@@ -89,18 +89,18 @@ class ProfitController extends Controller
             $sales = SoDetail::whereHas('so_header',function ($query) use($from, $to, $branch){
                 $query->whereBetween('so_date', [$from, $to])->where(['branch_code' => $branch]);
             })->select(DB::raw('sod_prod_code,sod_prod_name, sum(sod_prod_qty) as total_qty, br.name as branch,
-                    AVG(sod_less) as less, AVG(bri.cost) as cost, AVG(bri.price) as srp,
+                    AVG(sod_less) as less, AVG(sod_prod_cost) as cost, AVG(sod_prod_srp) as srp,
                     SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) / sum(sod_prod_qty) as price,
                     SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_amount, 
-                    SUM(bri.cost * sod_prod_qty) as total_cost'))
+                    SUM(sod_prod_cost * sod_prod_qty) as total_cost'))
                 ->groupBy('sod_prod_code','sod_prod_name','br.name')
                 //->join('branch__inventories as bri','sod_prod_code','=','bri.prod_code')
                 ->join('so_headers as soh','soh.so_code','=','sod_code')
                 ->join('branches as br','soh.branch_code','=','br.code')
-                ->join('branch__inventories as bri', function ($join) {
+                /*->join('branch__inventories as bri', function ($join) {
                     $join->on('bri.prod_code', '=', 'sod_prod_code');
                     $join->on('bri.branch_code','=','soh.branch_code');
-                })
+                })*/
                 ->get();
 
         }
@@ -115,7 +115,7 @@ class ProfitController extends Controller
              echo $sale->branch_code.' - '.$sale->sod_prod_code. ' - '.$sale->total_amount.' - '.$sale->total_cost.'<br>';
          }*/
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.profit.profit',compact('sales','request', 'branches','inventories','total_cost'));
+        return view($this->position().'.new_reports.profit',compact('sales','request', 'branches','inventories','total_cost'));
     }
     public function print_report(Request $request)
     {
@@ -128,18 +128,19 @@ class ProfitController extends Controller
             $sales = SoDetail::whereHas('so_header',function ($query) use($from, $to){
                 $query->whereBetween('so_date', [$from, $to]);
             })->select(DB::raw('sod_prod_code,sod_prod_name, sum(sod_prod_qty) as total_qty, 
-                    AVG(sod_less) as less, AVG(bri.cost) as cost, AVG(bri.price) as srp,
+                    AVG(sod_less) as less, AVG(sod_prod_cost) as cost, AVG(sod_prod_srp) as srp,
                     SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) / sum(sod_prod_qty) as price,
-                    SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_amount, SUM(bri.cost * sod_prod_qty) as total_cost'))
+                    SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_amount, SUM(sod_prod_cost * sod_prod_qty) as total_cost'))
                 ->groupBy('sod_prod_code','sod_prod_name')
                 //->join('branch__inventories as bri','sod_prod_code','=','bri.prod_code')
                 ->join('so_headers as soh','soh.so_code','=','sod_code')
-                ->join('branch__inventories as bri', function ($join) {
+                /*->join('branch__inventories as bri', function ($join) {
                     $join->on('bri.prod_code', '=', 'sod_prod_code');
                     $join->on('bri.branch_code','=','soh.branch_code');
 
-                })
+                })*/
                 ->get();
+            $br = "ALL BRANCH";
         }elseif($request->optCustType == "branch"){
             /*$sales = SoHeader::where(['branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])->get();
             $inventories = Branch_Inventory::where(['branch_code' => $request->branch])->get();*/
@@ -147,19 +148,20 @@ class ProfitController extends Controller
             $sales = SoDetail::whereHas('so_header',function ($query) use($from, $to, $branch){
                 $query->whereBetween('so_date', [$from, $to])->where(['branch_code' => $branch]);
             })->select(DB::raw('sod_prod_code,sod_prod_name, sum(sod_prod_qty) as total_qty, br.name as branch,
-                    AVG(sod_less) as less, AVG(bri.cost) as cost, AVG(bri.price) as srp,
+                    AVG(sod_less) as less, AVG(sod_prod_cost) as cost, AVG(sod_prod_srp) as srp,
                     SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) / sum(sod_prod_qty) as price,
                     SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_amount, 
-                    SUM(bri.cost * sod_prod_qty) as total_cost'))
+                    SUM(sod_prod_cost * sod_prod_qty) as total_cost'))
                 ->groupBy('sod_prod_code','sod_prod_name','br.name')
                 //->join('branch__inventories as bri','sod_prod_code','=','bri.prod_code')
                 ->join('so_headers as soh','soh.so_code','=','sod_code')
                 ->join('branches as br','soh.branch_code','=','br.code')
-                ->join('branch__inventories as bri', function ($join) {
+                /*->join('branch__inventories as bri', function ($join) {
                     $join->on('bri.prod_code', '=', 'sod_prod_code');
                     $join->on('bri.branch_code','=','soh.branch_code');
-                })
+                })*/
                 ->get();
+            $br = Branch::where(['code' => @$request->branch])->first()->name." BRANCH";
         }
         $data = array();
         $total =  0;
@@ -188,9 +190,9 @@ class ProfitController extends Controller
             $tot_profit += $profit;
         }
 
-        return Excel::create('Taurus Profit Margin Report', function($excel) use ($data, $total, $tot_profit, $total_cost) {
+        return Excel::create('Taurus Profit Margin Report', function($excel) use ($data, $total, $tot_profit, $total_cost, $br, $from, $to) {
             $excel->setTitle('Taurus Profit Margin Report');
-            $excel->sheet('Profit Margin Report', function($sheet) use ($data, $total, $tot_profit, $total_cost)
+            $excel->sheet('Profit Margin Report', function($sheet) use ($data, $total, $tot_profit, $total_cost, $br, $from, $to)
             {
                 $sheet->setColumnFormat(array(
                     'D' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
@@ -202,7 +204,7 @@ class ProfitController extends Controller
                 ));
                 $sheet->fromArray($data);
 
-                $sheet->prependRow(1, ["Taurus Profit Margin Report "]);
+                $sheet->prependRow(1, ["Taurus Profit Margin Report $br $from - $to"]);
                 $sheet->mergeCells("A1:K1");
                 $sheet->cell('A1', function($cell) {
                     // change header color

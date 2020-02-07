@@ -7,7 +7,7 @@
             @include('Management.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Taurus Enteprise Block Box Report</h2>
+                    <h2>Taurus New Enteprise Block Box Report</h2>
                     <ol class="breadcrumb">
                         <li>
                             <a href="{{ url('\home') }}">Home</a>
@@ -16,7 +16,7 @@
                             <a>Taurus</a>
                         </li>
                         <li class="active">
-                            <strong>Taurus Enteprise Block Box Report</strong>
+                            <strong>Taurus New Enteprise Block Box Report</strong>
                         </li>
                     </ol>
                 </div>
@@ -48,7 +48,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <form role="form" action="/erp_report" method="post" name="myform" id="myform">
+                            <form role="form" action="/nr_erp_report" method="post" name="myform" id="myform">
                                 <div class="ibox-content">
                                     {{ csrf_field() }}
                                     <p>Show report by</p>
@@ -114,7 +114,7 @@
                                     </div>--}}
                                 </div>
                                 <div class="ibox-content tooltip-demo">
-                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/erp_report/print">
+                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/nr_erp_report/print">
                                         <span aria-hidden="true" class="fa fa-print fa-5x"></span>
                                     </button>
 
@@ -158,6 +158,12 @@
                                                     {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
                                                 </tr>
                                                 <tr>
+                                                    <td>Sales Return</td>
+                                                    <td>{!! Number_Format(@$sales_return->total_so_return_cost,2) !!}</td>
+                                                    <td>{!! Number_Format(@$sales_return->total_so_return_srp,2) !!}</td>
+                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                <tr>
                                                     <td>Transfer out</td>
                                                     <td>{!! Number_Format(@$tf_out->total_tf_out_cost,2) !!}</td>
                                                     <td>{!! Number_Format(@$tf_out->total_tf_out_srp,2) !!}</td>
@@ -170,11 +176,23 @@
                                                     {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
                                                 </tr>
                                                 <tr>
+                                                    <td>Positive Discount</td>
+                                                    <td>{!! Number_Format(@$sales_disc->pos_disc_perc,2) !!}%</td>
+                                                    <td>{!! Number_Format(@$sales_disc->pos_disc,2) !!}</td>
+                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                <tr>
+                                                    <td>Negative Discount</td>
+                                                    <td>{!! Number_Format(@$sales_disc->neg_disc_perc,2) !!}%</td>
+                                                    <td>{!! Number_Format(@$sales_disc->neg_disc,2) !!}</td>
+                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                {{--<tr>
                                                     <td>Discount</td>
                                                     <td>{!! Number_Format(@$sales_disc->total_so_disc_cost,2) !!}%</td>
                                                     <td>{!! Number_Format(@$sales_disc->total_so_disc_srp,2) !!}</td>
-                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
-                                                </tr>
+                                                    --}}{{-- <td>{{ $item->tf_to_branch->name }}</td>--}}{{--
+                                                </tr>--}}
                                                 <tr>
                                                     <td>Miscellaneous IN</td>
                                                     <td>{!! Number_Format(@$misc_in->misc_in_cost,2) !!}</td>
@@ -253,6 +271,7 @@
         $('#tbl-transfer').DataTable({
             dom: '<"html5buttons"B>lTfgitp',
             "bSort" : false,
+            "pageLength": 25,
             buttons: [
                 /* {extend: 'copy'},
                  {extend: 'csv'},*/

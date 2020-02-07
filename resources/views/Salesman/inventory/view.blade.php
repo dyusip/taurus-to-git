@@ -47,7 +47,7 @@
                                                         <th>Code</th>
                                                         <th>Name</th>
                                                         <th>Description</th>
-                                                        <th>Cost</th>
+                                                        <!--<th>Cost</th>-->
                                                         <th>Quantity</th>
                                                         <th>Price</th>
                                                         <th>UOM</th>
@@ -71,7 +71,7 @@
                                                         <th>Code</th>
                                                         <th>Name</th>
                                                         <th>Description</th>
-                                                        <th>Cost</th>
+                                                        <!--<th>Cost</th>-->
                                                         <th>Quantity</th>
                                                         <th>Price</th>
                                                         <th>UOM</th>
@@ -167,7 +167,7 @@
             {data: 1, name: 'branch__inventories.prod_code'},
             {data: 9, name: 'inventories.name'},
             {data: 10, name: 'inventories.desc'},
-            {data: 3, name: 'branch__inventories.cost'},
+            /*{data: 3, name: 'branch__inventories.cost'},*/
             {data: 4, name: 'branch__inventories.quantity'},
             {data: 2, name: 'branch__inventories.price'},
             {data: 11, name: 'inventories.uom'},

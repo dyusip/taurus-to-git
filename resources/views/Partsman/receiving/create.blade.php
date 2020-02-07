@@ -47,7 +47,8 @@
                     <input type="hidden" class="form-control" name="rh_no" id="rh_no" value="{{ $num }}">
                     <input type="hidden" class="form-control" name="rh_branch_code" id="rh_no" value="{{ Auth::user()->branch }}">
                     <input type="hidden" class="form-control" name="rh_prepby" id="rh_no" value="{{ Auth::user()->username }}">
-                    <input type="hidden" class="form-control" name="rh_status" id="status">
+                    <input type="hidden" class="form-control" name="po_status" id="status">
+                    <input type="hidden" class="form-control" name="rh_status" value="OP">
                     <div class="row">
                         <div class="col-lg-7">
                             <div class="ibox float-e-margins">
@@ -78,7 +79,7 @@
                                                 <select required class="form-control select2_demo_1" name="rh_po_no" id="PO_No">
                                                     <option value=""></option>
                                                     @foreach($pos as $po)
-                                                        <option value="{{ $po->po_code }}">{{ $po->po_code ." - ". $po->sup_name }}</option>
+                                                        <option value="{{ $po->po_code }}">{{ $po->po_code ." - ". $po->supplier->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -232,6 +233,22 @@
 <script>
     $(document).ready(function () {
         Choosen();
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "progressBar": true,
+            "preventDuplicates": true,
+            "positionClass": "toast-top-right",
+            "onclick": null,
+            "showDuration": "400",
+            "hideDuration": "1000",
+            "timeOut": "7000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
     });
     function Choosen() {
         $(".select2_demo_1").select2();
@@ -293,7 +310,6 @@
                     $('tbody').append(row);
                 });
                 checkStatus();
-
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert(xhr.status + " "+ thrownError);
@@ -339,7 +355,6 @@
             }
             checkStatus();
         }
-
     });
     //remove
     $('body').delegate('#remove-row','click',function () {

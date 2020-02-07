@@ -7,15 +7,24 @@
         <ul class="nav navbar-top-links navbar-right">
             <li class="dropdown">
                 <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                    <i class="fa fa-bell"></i>  <span class="label label-primary">{{$notify}}</span>
+                    <i class="fa fa-bell"></i>  <span class="label label-danger">{{$notify}}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-alerts">
 
                    {{-- @foreach($notify_data as $data)--}}
                         <li>
+                            <a href="/pr_approval{{--{{$data->po_code}}--}}">
+                                <div>
+                                    <i class="fa fa-mail-forward"></i> Purchase Request <span class="label label-primary" style="margin-left: 3%">{{$pr}}</span> {{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                    <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
                             <a href="/notification/po{{--{{$data->po_code}}--}}">
                                 <div>
-                                    <i class="fa fa-cogs fa-fw"></i> Puchase Order <span class="label label-info">{{$po_count}}</span>{{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                    <i class="fa fa-cogs fa-fw"></i> Purchase Order <span class="label label-info">{{$po_count}}</span>{{--{{$data->po_code ." - ". $data->sup_name }}--}}
                                     <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
                                 </div>
                             </a>

@@ -155,4 +155,54 @@ class ImportInventoryController extends Controller
             }
         }
     }
+    public function branch_update_index()
+    {
+        $branches = Branch::where(['status' => 'AC'])->get();
+        return view('Purchasing.import.branch_update',compact('branches'));
+    }
+    public function branch_update_import(Request $request){
+        //validate the xls file
+        $this->validate($request, array(
+            'file'      => 'required'
+        ));
+
+        if($request->hasFile('file')){
+            $extension = File::extension($request->file->getClientOriginalName());
+            if ($extension == "xlsx" || $extension == "xls" || $extension == "csv") {
+
+                $path = $request->file->getRealPath();
+                $data = Excel::load($path, function($reader) {
+                })->get();
+                if(!empty($data) && $data->count()){
+
+                    foreach ($data as $key => $value) {
+                        $quantity = $value->count != '' ? $value->count : 0;
+
+                        $check = Branch_Inventory::where(['branch_code' => $request->branch_code,
+                            'prod_code' => $value->code]);
+                        $insertData = $check->update(['quantity' => $quantity]);
+                    }
+
+                    if(!empty($insertData)){
+
+                        //$insertData = DB::table('branch__inventories')->insert($insert);
+
+                        if ($insertData) {
+                            Session::flash('success', 'Your Data has successfully imported');
+                            Activity::log("Imported inventory in $request->branch_code branch", Auth::user()->id);
+                        }else {
+                            Session::flash('error', 'Error inserting the data..');
+                            return back();
+                        }
+                    }
+                }
+
+                return back();
+
+            }else {
+                Session::flash('error', 'File is a '.$extension.' file.!! Please upload a valid xls/csv file..!!');
+                return back();
+            }
+        }
+    }
 }

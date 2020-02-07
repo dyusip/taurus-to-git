@@ -4,10 +4,10 @@
     <div id="wrapper">
 
         <!-- Navigation -->
-        @include('Partsman.sidebar')
+        @include('Purchasing.sidebar')
 
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Partsman.header')
+            @include('Purchasing.header')
 
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
@@ -97,11 +97,11 @@
             {data: 1, name: 'transfer_headers.tf_code'},
             {data: 12+'.name', name: 'tf_fr_branch.name'},
             {data: 13+'.name', name: 'tf_to_branch.name'},
-            {data: 4, name: 'transfer_headers.tf_date'},
+            {data: 5, name: 'transfer_headers.tf_date'},
             {data: 14+'.name', name: 'tf_prep_by.name'},
-           /* {data: 14+'.name', name: 'tf_app_by.name'},*/
+            /* {data: 14+'.name', name: 'tf_app_by.name'},*/
             {data: 15, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
-            {{--{!! $branch->code==Auth::user()->branch?"{data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}":''  !!}--}}
+
         ],
         "order": [[3, 'desc']]
     });

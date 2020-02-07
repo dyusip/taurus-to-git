@@ -19,10 +19,12 @@ class SoHeader extends Model
     public function getSoDateAttribute($value)
     {
         return Carbon::createFromFormat('Y-m-d', $value)->format('m/d/Y');
-
     }
     public function so_detail(){
         return $this->hasMany(SoDetail::class,'sod_code','so_code');
+    }
+    public function so_logs(){
+        return $this->hasMany(SalesLogs::class,'sol_code','so_code');
     }
     public function so_sr_header(){
         return $this->hasMany(SrHeader::class,'so_code','so_code');

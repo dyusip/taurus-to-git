@@ -12,6 +12,19 @@ use Activity;
 class NotificationController extends Controller
 {
     //
+    private function position()
+    {
+        if (Auth::user()->position == 'CEO' || Auth::user()->position == 'CFO'){
+            $position = 'Management';
+        }elseif (Auth::user()->position == 'PARTS-MAN'){
+            $position = 'Partsman';
+        }elseif (Auth::user()->position == 'SALESMAN'){
+            $position = 'Salesman';
+        }elseif (Auth::user()->position == 'PURCHASING' || Auth::user()->position == 'AUDIT-OFFICER'){
+            $position = 'Purchasing';
+        }
+        return $position;
+    }
     public function po_index(){
         $pos = PoHeader::where(['status' => 'PD'])->get();
         return view('Management.Approve.po',compact('pos'));
@@ -19,7 +32,7 @@ class NotificationController extends Controller
     public function show_po($id){
         $po = PoHeader::where(['po_code' => $id])->firstOrFail();
         //return view('Management.Approve.approve',compact('po'));
-        return json_encode(['header'=>$po, 'detail'=>$po->po_detail]);
+        return json_encode(['header'=>$po, 'detail'=>$po->po_detail,'supplier'=> $po->supplier]);
     }
     public function save_po(Request $request){
         $app_po = PoHeader::where(['po_code' => $request->PONo]);
@@ -33,8 +46,12 @@ class NotificationController extends Controller
     }
     //Transfer
     public function tf_index(){
-        $tfs = TransferHeaders::where(['tf_status' => 'PD'])->get();
-        return view('Management.Approve.transfer',compact('tfs'));
+        if($this->position() != 'Management'){
+            $tfs = TransferHeaders::where(['tf_status' => 'PD'])->where('from_branch','!=','TR-BR00001')->get();
+        }else{
+            $tfs = TransferHeaders::where(['tf_status' => 'PD'])->get();
+        }
+        return view($this->position().'.Approve.transfer',compact('tfs'));
     }
 
     public function show_tf($id){
@@ -50,14 +67,14 @@ class NotificationController extends Controller
         if($request->status=='AP'){
             foreach ($app_tf->firstOrFail()->tf_detail as $item) {
                 $to_inv = Branch_Inventory::where(['prod_code'=> $item->tf_prod_code, 'branch_code'=>$app_tf->firstOrFail()->to_branch]);
-                $to_inv->update(['quantity'=> DB::raw('quantity + '.$item->tf_prod_qty)]);;
+                $to_inv->update(['quantity'=> DB::raw('quantity + '.$item->tf_prod_qty)]);
 
                 $fr_inv = Branch_Inventory::where(['prod_code'=> $item->tf_prod_code, 'branch_code'=>$app_tf->firstOrFail()->from_branch]);
-                $fr_inv->update(['quantity'=> DB::raw('quantity - '.$item->tf_prod_qty)]);;
+                $fr_inv->update(['quantity'=> DB::raw('quantity - '.$item->tf_prod_qty)]);
             }
         }
         $status = ($request->status=='AP')?'Approved':'Disapproved';
-        Activity::log("$status PO # $request->PONo", Auth::user()->id);
+        Activity::log("$status Transfer # $request->tf_code", Auth::user()->id);
         return redirect('/notification/transfer')->with('status', "Transfer# $request->tf_code successfully $status");
     }
 }

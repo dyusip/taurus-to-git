@@ -14,6 +14,7 @@ class HomeController extends Controller
 {
     private function position()
     {
+        $position = "";
         if(Auth::user()->position==='Administrator'){
             $position = 'Admin';
         }elseif (Auth::user()->position==='PURCHASING' || Auth::user()->position==='AUDIT-OFFICER'){
@@ -48,7 +49,16 @@ class HomeController extends Controller
     {
         //$inventories = Branch_Inventory::paginate('10');
         if($this->position()){
-            return view($this->position().'/index');
+            $items = Branch_Inventory::select(DB::raw('branch_code, SUM(cost * quantity) as total_cost, SUM(price * quantity) as total_srp'))
+                ->groupBy('branch_code')
+                ->get();
+            $stats = Branch_Inventory::select(DB::raw('branch_code, SUM(quantity) as total_qty, COUNT(NULLIF(quantity,0)) as total_count'))
+                ->groupBy('branch_code')
+                ->get();
+            $minmaxes = Branch_Inventory::where('quantity','!=',0)->select(DB::raw('branch_code, Min(cost) as min_cost, Max(cost) as max_cost,Min(price) as min_srp, Max(price) as max_srp'))
+                ->groupBy('branch_code')
+                ->get();
+            return view($this->position().'/index',compact('items','stats','minmaxes'));
         }
         Auth::logout();
         return view('auth.login');
@@ -64,7 +74,16 @@ class HomeController extends Controller
         $inventories = Branch_Inventory::whereHas('inventory', function ($query) use ($key) {
             $query->where('name', 'like', '%' . $key . '%');
         })->paginate('10');
-        return view($this->position().'.index', compact('inventories', 'key'));
+        $items = Branch_Inventory::select(DB::raw('branch_code, SUM(cost * quantity) as total_cost, SUM(price * quantity) as total_srp'))
+            ->groupBy('branch_code')
+            ->get();
+        $stats = Branch_Inventory::select(DB::raw('branch_code, SUM(quantity) as total_qty, COUNT(NULLIF(quantity,0)) as total_count'))
+            ->groupBy('branch_code')
+            ->get();
+        $minmaxes = Branch_Inventory::where('quantity','!=',0)->select(DB::raw('branch_code, Min(cost) as min_cost, Max(cost) as max_cost,Min(price) as min_srp, Max(price) as max_srp'))
+            ->groupBy('branch_code')
+            ->get();
+        return view($this->position().'.index', compact('inventories', 'key','items','stats','minmaxes'));
     }
     public function suggest()
     {

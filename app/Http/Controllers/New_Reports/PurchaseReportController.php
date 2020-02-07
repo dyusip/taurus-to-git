@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\PurchaseReport;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\PoHeader;
@@ -30,21 +30,25 @@ class PurchaseReportController extends Controller
     {
         $branches = Branch::where(['status'=>'AC'])->get();
 
-        return view($this->position().'.purchase_report.purchase',compact('branches'));
+        return view($this->position().'.new_reports.purchase',compact('branches'));
     }
     public function show(Request $request)
     {
         $from = Carbon::createFromFormat('m/d/Y', $request->start)->format('Y-m-d');
         $to = Carbon::createFromFormat('m/d/Y', $request->end)->format('Y-m-d');
-        $items = PoHeader::whereBetween('po_date', [$from, $to])->get();
+        $items = PoHeader::whereBetween('po_date', [$from, $to])->where(function($query)  {
+            $query->where('status','=','AP')->orWhere('status','=','CL');
+        })->get();
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.purchase_report.purchase',compact('items','request', 'branches'));
+        return view($this->position().'.new_reports.purchase',compact('items','request', 'branches'));
     }
     public function print_report(Request $request)
     {
         $from = Carbon::createFromFormat('m/d/Y', $request->start)->format('Y-m-d');
         $to = Carbon::createFromFormat('m/d/Y', $request->end)->format('Y-m-d');
-        $items = PoHeader::whereBetween('po_date', [$from, $to])->get();
+        $items = PoHeader::whereBetween('po_date', [$from, $to])->where(function($query)  {
+            $query->where('status','=','AP')->orWhere('status','=','CL');
+        })->get();
         $data = array();
         $total =  0;
         foreach($items as $item){
@@ -54,27 +58,31 @@ class PurchaseReportController extends Controller
                     'DATE' => $item->po_date,
                     'ITEM CODE' => $story->prod_code,
                     'NAME' => $story->prod_name,
+                    'COST' => $story->prod_cost,
+                    'SRP' => $story->prod_srp,
                     'QTY' => $story->prod_qty,
-                    'PRICE' => $story->prod_price,
+                    'PO PRICE' => $story->prod_price,
                     'LESS' => $story->prod_less."%",
-                    'AMOUNT' => $story->prod_amount,
+                    'PO AMOUNT' => $story->prod_amount,
                 ];
                 $total += $story->prod_amount;
             }
         }
 
-        return Excel::create('Taurus Purchase Report', function($excel) use ($data, $total) {
-            $excel->sheet('Purchase Report', function($sheet) use ($data, $total)
+        return Excel::create('Taurus Purchase Report', function($excel) use ($data, $total, $from, $to) {
+            $excel->sheet('Purchase Report', function($sheet) use ($data, $total, $from, $to)
             {
                 $sheet->setColumnFormat(array(
+                    'E' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
                     'F' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
                     'H' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'J' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
                 ));
 
                 $sheet->fromArray($data);
 
-                $sheet->prependRow(1, ["Taurus Purchase Report "]);
-                $sheet->mergeCells("A1:H1");
+                $sheet->prependRow(1, ["Taurus Purchase Report $from - $to"]);
+                $sheet->mergeCells("A1:J1");
                 $sheet->cell('A1', function($cell) {
                     // change header color
                     $cell->setBackground('#3ed1f2')
@@ -89,7 +97,7 @@ class PurchaseReportController extends Controller
                 $sheet->appendRow("$footerRow",[
                     'Total Amount: ₱'.Number_Format($total,2)
                 ]);
-                $sheet->mergeCells("A{$footerRow}:H{$footerRow}");
+                $sheet->mergeCells("A{$footerRow}:J{$footerRow}");
                 $sheet->cell("A{$footerRow}", function($cell) {
                     $cell->setBackground('#3ed1f2')
                         ->setAlignment('right')

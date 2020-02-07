@@ -7,7 +7,7 @@
             @include('Management.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Taurus Transfer Report</h2>
+                    <h2>Taurus CW Deliveries Report</h2>
                     <ol class="breadcrumb">
                         <li>
                             <a href="dashboard.php">Home</a>
@@ -16,7 +16,7 @@
                             <a>Taurus</a>
                         </li>
                         <li class="active">
-                            <strong>Taurus Transfer Report</strong>
+                            <strong>Taurus CW Deliveries Report</strong>
                         </li>
                     </ol>
                 </div>
@@ -123,7 +123,7 @@
                                                 <th data-hide="phone" width="9%">DATE</th>
                                                 <th data-hide="phone" width="10%">ITEM CODE</th>
                                                 <th data-hide="phone" width="23%">NAME</th>
-                                                {{--<th data-hide="phone" width="9%">CATEGORY</th>--}}
+                                                <th data-hide="phone" width="5%">COST</th>
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
                                                 <th data-hide="phone,tablet" width="5%">PRICE</th>
                                                 <th class="text-center" width="8%">AMOUNT</th>
@@ -132,7 +132,7 @@
                                             <tbody id="order-tbl" class="tooltip-demo">
                                             @if(isset($items))
                                                 @php $total = 0; @endphp
-                                                @foreach($items as $item)
+                                                {{--@foreach($items as $item)
                                                     @foreach($item->tf_detail as $story)
                                                         <tr>
                                                             <td>{{ $item->tf_code }}</td>
@@ -149,6 +149,24 @@
                                                             $total += $story->tf_prod_amount;
                                                         @endphp
                                                     @endforeach
+                                                @endforeach--}}
+                                                @foreach($items as $item)
+                                                        <tr>
+                                                            <td>{{ $item->tf_code }}</td>
+                                                            <td>{{ $item->from_branch }}</td>
+                                                            <td>{{ $item->to_branch }}</td>
+                                                            <td>{{ $item->tf_date }}</td>
+                                                            <td>{{ $item->tf_prod_code }}</td>
+                                                            <td>{{ $item->tf_prod_name }}</td>
+                                                            <td>{{ Number_Format($item->tf_prod_price,2) }}</td>
+                                                            <td>{{ $item->tf_prod_qty }}</td>
+                                                            <td>{{ $item->srp }}</td>
+                                                            <td>{{ Number_Format($item->tf_prod_amount,2) }}</td>
+                                                        </tr>
+                                                        @php
+                                                            $total += $item->tf_prod_amount;
+                                                        @endphp
+
                                                 @endforeach
                                             @endif
                                             </tbody>
@@ -161,7 +179,7 @@
                                                 <td style="display: none;"></td>
                                                 <td style="display: none;"></td>
                                                 <td style="display: none;"></td>
-                                                <th class="text-right" colspan="8">TOTAL AMOUNT</th>
+                                                <th class="text-right" colspan="9">TOTAL AMOUNT</th>
                                                 <th>{{ Number_Format(@$total,2) }}</th>
                                             </tr>
 

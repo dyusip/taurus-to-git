@@ -40,6 +40,10 @@
                                 @foreach($branches as $branch)
                                     <div id="tab-{{$ctr}}" class="tab-pane {{($branch->code==Auth::user()->branch)?'active':''}}">
                                         <div class="panel-body">
+                                            <div>
+                                                <a href="{{ url('/salesman/inventory/print/'.$branch->code.'') }}" class="btn btn-primary btn-sm"><i class="fa fa-print"></i> Print</a>
+                                            </div>
+                                            <br>
                                             <div class="table-responsive">
                                                 <table width="100%" class="table table-striped table-bordered table-hover dataTables-example" id="dataTables-{{$branch->code}}">
                                                     <thead>

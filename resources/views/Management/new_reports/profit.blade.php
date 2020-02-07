@@ -7,7 +7,7 @@
             @include('Management.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Profit Margin Report</h2>
+                    <h2>New Profit Margin Report</h2>
                     <ol class="breadcrumb">
                         <li>
                             <a href="dashboard.php">Home</a>
@@ -16,7 +16,7 @@
                             <a>Taurus</a>
                         </li>
                         <li class="active">
-                            <strong>Profit Margin Report</strong>
+                            <strong>New Profit Margin Report</strong>
                         </li>
                     </ol>
                 </div>
@@ -48,7 +48,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <form role="form" action="/profit" method="post" name="myform" id="myform">
+                            <form role="form" action="/nr_profit" method="post" name="myform" id="myform">
                                 <div class="ibox-content">
                                     {{ csrf_field() }}
                                     <p>Show report by</p>
@@ -108,7 +108,7 @@
                                     </div>--}}
                                 </div>
                                 <div class="ibox-content tooltip-demo">
-                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/profit/print">
+                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/nr_profit/print">
                                         <span aria-hidden="true" class="fa fa-print fa-5x"></span>
                                     </button>
 

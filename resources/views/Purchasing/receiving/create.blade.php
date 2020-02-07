@@ -47,7 +47,8 @@
                 <input type="hidden" class="form-control" name="rh_no" id="rh_no" value="{{ $num }}">
                 <input type="hidden" class="form-control" name="rh_branch_code" id="rh_no" value="{{ Auth::user()->branch }}">
                 <input type="hidden" class="form-control" name="rh_prepby" id="rh_no" value="{{ Auth::user()->username }}">
-                <input type="hidden" class="form-control" name="rh_status" id="status">
+                <input type="hidden" class="form-control" name="po_status" id="status">
+                <input type="hidden" class="form-control" name="rh_status" value="OP">
                 <div class="row">
                     <div class="col-lg-7">
                         <div class="ibox float-e-margins">
@@ -78,7 +79,7 @@
                                             <select required class="form-control select2_demo_1" name="rh_po_no" id="PO_No">
                                                 <option value=""></option>
                                                 @foreach($pos as $po)
-                                                    <option value="{{ $po->po_code }}">{{ $po->po_code ." - ". $po->sup_name }}</option>
+                                                    <option value="{{ $po->po_code }}">{{ $po->po_code ." - ". $po->supplier->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -164,6 +165,8 @@
                             </div>
                             <div class="ibox-content">
                                 <div class="alert alert-danger" id="checker-alert" hidden></div>
+                                <small class="text-danger">Note: Item that has a red text is higher purchase cost than inventory cost <i class="fa fa-exclamation-circle"></i></small>
+                                <br><br>
                                 <div class="table-responsive">
                                     <table class="table table-striped table-bordered table-hover" id="dataTables-salesOrder" data-page-size="15">
                                         <thead>
@@ -196,6 +199,30 @@
                 </div><!--row-->
             </form>
 
+        </div>
+
+        <!-- modal-->
+        <div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content animated bounceInRight">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <i class="fa fa-laptop modal-icon"></i>
+                        <h4 class="modal-title">Update Inventory Cost</h4>
+                        <small class="font-bold">Update inventory cost based on purchase</small>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group"><label>Cost</label> <input type="text" id="cost" readonly class="form-control">
+                            <input type="hidden" id="prod_code"  readonly class="form-control">
+                        </div>
+                        <div class="form-group"><label>Purchase Cost</label> <input type="text" id="prod_cost"  class="form-control"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                        <button type="button" id="update-cost" class="btn btn-primary">Update Cost</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -297,18 +324,48 @@
                     var prod_qty = (value.prod_qty)?value.prod_qty:value.rd_prod_qty;
                     var status = (value.rd_status)?value.rd_status:'';
                     (value.rd_prod_code)?$('#partial_rec').html('Partial Rec'):$('#partial_rec').html('Qty Purchase');
-                    var row = "<tr> " +
+                    var tr_stat =  (Number(value.prod_price) > Number(value.cost))?'text-danger':'';
+                    var view =  (Number(value.prod_price) > Number(value.cost))?' <a id="edit-row" data-prod_code="'+prod_code+'" data-prod_cost="'+value.prod_price+'" data-cost="'+value.cost+'" class="text-success" data-toggle="tooltip" title="Edit cost"><i class="fa fa-edit"></i></a>':'';
+                    var row = "<tr class='"+ tr_stat +"'> " +
                         "<td><input type='text' name='prod_code[]' value='"+prod_code+"' id='code' class='form-control code' readonly></td> " +
                         "<td><input type='text' name='prod_name[]' value='"+prod_name+"' id='prod_name' class='form-control' readonly></td> " +
                         '<td><input type="text" name="uom[]" value="'+prod_uom+'" id="uom" class="form-control" readonly></td> ' +
                         '<td><input type="text" name="qty[]" value="'+prod_qty+'" id="qty" class="form-control" readonly></td> ' +
                         '<td><input type="text" name="rec_qty[]" required id="rec_qty" class="form-control"></td> ' +
                         '<td class="text-center"><input type="text" name="status[]" id="status" value="'+status+'" class="form-control status" readonly></td> ' +
-                        '<td class="text-center tooltip-demo"><a id="remove-row" class="text-danger" data-toggle="tooltip" title="Remove item"><i class="fa fa-remove"></i></a></td> ' +
+                        '<td class="text-center tooltip-demo"><a id="remove-row" class="text-danger" data-toggle="tooltip" title="Remove item"><i class="fa fa-remove"></i></a>' +
+                            view+
+                        '</td> ' +
                         '</tr>';
                     $('tbody').append(row);
                 });
                 checkStatus();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status + " "+ thrownError);
+            }
+        });
+    });
+    $(document).on('click','#edit-row',function () {
+        $('#myModal').modal('show');
+        var prod_cost = $(this).data('prod_cost');
+        var cost = $(this).data('cost');
+        var prod_code = $(this).data('prod_code');
+        $('#cost').val(cost);
+        $('#prod_cost').val(prod_cost);
+        $('#prod_code').val(prod_code);
+    });
+    $(document).on('click','#update-cost',function () {
+        var prod_cost =  $('#prod_cost').val();
+        var prod_code = $('#prod_code').val();
+        $.ajax({url: "/receiving/update/"+prod_code+"/"+prod_cost,
+            beforeSend: function() {
+                $('#main-spinner').fadeIn();
+            },
+            success: function(output) {
+                $('#myModal').modal('hide');
+                $('#PO_No').trigger('change');
+                toastr.success("Item # "+prod_code+" successfully updated.");
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert(xhr.status + " "+ thrownError);

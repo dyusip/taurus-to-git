@@ -9,7 +9,7 @@ class TransferHeaders extends Model
 {
     //
     protected $fillable = [
-        'tf_code', 'from_branch', 'to_branch', 'tf_date', 'tf_prepby', 'tf_appby','tf_amount', 'tf_status'
+        'tf_code', 'from_branch', 'to_branch', 'tf_date', 'tf_prepby', 'tf_appby','tf_amount', 'tf_status','rqh_code'
     ];
     public function getTfDateAttribute($value)
     {
@@ -36,5 +36,6 @@ class TransferHeaders extends Model
     public function tf_app_by()
     {
         return $this->belongsTo(User::class,'tf_appby','username');
+
     }
 }

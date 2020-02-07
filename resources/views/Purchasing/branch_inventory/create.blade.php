@@ -66,12 +66,21 @@
                                                 </span>
                                                 @endif
                                             </div>
-                                            <div class="form-group {{ $errors->has('cost') ? ' has-error' : '' }}">
+                                            {{--<div class="form-group {{ $errors->has('cost') ? ' has-error' : '' }}">
                                                 <label>Cost</label>
                                                 <input type="text" autocomplete="off" placeholder="Cost" value="{{ old('cost') }}" name="cost" id="cost" required class="form-control">
                                                 @if ($errors->has('cost'))
                                                     <span class="help-block">
                                                         <strong>{{ $errors->first('cost') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="form-group {{ $errors->has('quantity') ? ' has-error' : '' }}" id="div-qty" hidden>
+                                                <label>Quantity</label>
+                                                <input type="text" autocomplete="off" disabled placeholder="Quantity" value="{{ old('quantity') }}" name="quantity" id="quantity" required class="form-control">
+                                                @if ($errors->has('quantity'))
+                                                    <span class="help-block">
+                                                        <strong>{{ $errors->first('quantity') }}</strong>
                                                     </span>
                                                 @endif
                                             </div>
@@ -83,7 +92,7 @@
                                                         <strong>{{ $errors->first('price') }}</strong>
                                                     </span>
                                                 @endif
-                                            </div>
+                                            </div>--}}
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
                                                 <button class="btn btn-sm btn-primary ladda-button ladda-button-demo btn-block" data-style="zoom-in" name="register" type="submit"><strong id="register">Create Inventory</strong></button>
@@ -138,6 +147,34 @@
                                                 <a href="#"  id="add-item-main" class="btn btn-sm btn-success btn-block" ><i class="fa fa-angle-double-left"></i><strong> Add Item</strong></a>
                                             </div>
                                         </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal inmodal" id="modal-br-status" tabindex="-1" role="dialog"  aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content animated fadeIn">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <i class="fa fa-user modal-icon"></i>
+                                    <h4 class="modal-title" id="status_name">Are you sure you want to delete this item?</h4>
+                                    <small id="prod-name">Activation and deactivation of product</small>
+                                </div>
+                                <form class="" id="form-delete" method="post"  autocomplete="off" enctype= multipart/form-data>
+                                    {{ method_field('PUT') }}
+                                    {{ csrf_field() }}
+                                    <div class="modal-body text-right">
+                                        <input type="hidden" name="branch_code" id="branch_code_del">
+                                        <input type="hidden" name="prod_code" id="prod_code_del">
+                                        <input type="hidden" name="prod_name" id="prod_name_del">
+                                        <button type="submit" name="status" value="DELETE" class="btn btn-danger btn-md"><i class="fa fa-times"></i> Delete</button>
+                                        <button type="button" class="btn btn-default btn-md"><i class="fa fa-close"></i> Cancel</button>
+                                    </div>
+                                    <div class="modal-footer">
+
                                     </div>
                                 </form>
                             </div>
@@ -159,6 +196,12 @@
                                     @foreach($branches as $branch)
                                         <div id="tab-{{$ctr}}" class="tab-pane {{($ctr==1)?'active':''}}">
                                             <div class="panel-body">
+                                                {{--<div class="row">
+                                                    <div class="col-sm-3 pull-right">
+                                                        <button class="btn btn-success btn-sm btn-block"><i class="fa fa-download"></i> Export Inventory</button>
+                                                    </div>
+                                                </div>
+                                                <br>--}}
                                                 <div class="table-responsive">
                                                     <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-{{$branch->code}}">
                                                         <thead>
@@ -191,6 +234,14 @@
                                                         <tbody>
                                                         </tbody>
                                                     </table>
+                                                    <form action='{{ url("/branch_inventory/$branch->code") }}' method="post">
+                                                        {{ csrf_field() }}
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                        <div class="tooltip-demo">
+                                                        <button data-toggle="tooltip" title="Print" class="btn btn-info btn-circle btn-lg" type="submit"><i class="fa fa-print"></i>
+                                                        </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
 
                                             </div>
@@ -386,7 +437,24 @@
 
 <script>
     $(document).ready(function() {
-        $(".select2_demo_1").select2();
+        //$(".select2_demo_1").select2();
+        $('.select2_demo_1').select2({
+            matcher: function (params, data) {
+                if ($.trim(params.term) === '') {
+                    return data;
+                }
+
+                keywords=(params.term).split(" ");
+
+                for (var i = 0; i < keywords.length; i++) {
+                    if (((data.text).toUpperCase()).indexOf((keywords[i]).toUpperCase()) == -1)
+                    return null;
+                }
+                return data;
+            }
+        });
+        $('#quantity').removeAttr('disabled');
+        $('#div-qty').show();
 
         $(document).ready(function () {
             resizeChosen();
@@ -465,6 +533,9 @@
                 $("#prod_code").select2().select2('val',data.prod_code);
 
                 $('#cost').val(data.cost);
+                $('#quantity').val(data.quantity);
+                $('#quantity').removeAttr('disabled');
+                $('#div-qty').show();
                 $('#price').val(data.price);
                 $('#form-inventory').attr('action','/branch_inventory/'+id);
                 $('#_method').removeAttr('disabled');
@@ -474,8 +545,14 @@
 
         });
         $(document).on('click','#btn-delete',function () {
-            var id = $(this).data('id');
-            $('#form-status').attr('action','/inventory/'+id);
+            var branch = $(this).data('branch');
+            var prod = $(this).data('prod');
+            var name = $(this).data('name');
+            $('#prod-name').html(name);
+            $('#branch_code_del').val(branch);
+            $('#prod_code_del').val(prod);
+            $('#prod_name_del').val(name);
+            $('#form-status').attr('action','/branch_inventory/'+prod);
         });
         function validateCurrency(event) {
             var key = window.event ? event.keyCode : event.which;

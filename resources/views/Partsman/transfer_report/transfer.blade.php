@@ -123,15 +123,15 @@
                                                 <th data-hide="phone" width="9%">DATE</th>
                                                 <th data-hide="phone" width="10%">ITEM CODE</th>
                                                 <th data-hide="phone" width="23%">NAME</th>
-                                                {{--<th data-hide="phone" width="9%">CATEGORY</th>--}}
+                                                <th data-hide="phone" width="5%">COST</th>
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
-                                                <th data-hide="phone,tablet" width="5%">PRICE</th>
+                                                <th data-hide="phone,tablet" width="5%">SRP</th>
                                                 <th class="text-center" width="8%">AMOUNT</th>
                                             </tr>
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">
                                             @if(isset($items))
-                                                @php $total = 0; @endphp
+                                                {{--@php $total = 0; @endphp
                                                 @foreach($items as $item)
                                                     @foreach($item->tf_detail as $story)
                                                         <tr>
@@ -149,6 +149,25 @@
                                                             $total += $story->tf_prod_amount;
                                                         @endphp
                                                     @endforeach
+                                                @endforeach--}}
+                                                @php $total = 0; @endphp
+                                                @foreach($items as $item)
+                                                    <tr>
+                                                        <td>{{ $item->tf_code }}</td>
+                                                        <td>{{ $item->from_branch }}</td>
+                                                        <td>{{ $item->to_branch }}</td>
+                                                        <td>{{ $item->tf_date }}</td>
+                                                        <td>{{ $item->tf_prod_code }}</td>
+                                                        <td>{{ $item->tf_prod_name }}</td>
+                                                        <td>{{ Number_Format($item->tf_prod_price,2) }}</td>
+                                                        <td>{{ $item->tf_prod_qty }}</td>
+                                                        <td>{{ $item->srp }}</td>
+                                                        <td>{{ Number_Format($item->tf_prod_amount,2) }}</td>
+                                                    </tr>
+                                                    @php
+                                                        $total += $item->tf_prod_amount;
+                                                    @endphp
+
                                                 @endforeach
                                             @endif
                                             </tbody>

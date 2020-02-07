@@ -129,18 +129,31 @@
                                                 @php $total = 0; @endphp
                                                 @foreach($sales as $sale)
                                                     {{--@foreach($sale->so_detail as $story)--}}
-                                                    @foreach( $inventories as $inventory)
+                                                    {{--@foreach($inventories as $inventory)
                                                         @if($inventory->prod_code == $sale->sod_prod_code)
                                                             @php $onhand = $inventory->totalqty  @endphp
                                                         @endif
-                                                    @endforeach
+                                                    @endforeach--}}
                                                     <tr>
                                                         {{--<td class="text-center">{{ ucfirst($request->optCustType) }}</td>--}}
                                                         <td>{{ $sale->sod_prod_code}}</td>
                                                         <td>{{ $sale->sod_prod_name}}</td>
                                                         <td>{{ $sale->sod_prod_uom}}</td>
-                                                        <td>{{ $onhand }}</td>
+                                                        <td>{{ $sale->totalqty }}</td>
                                                         <td>{{ $sale->qty}}</td>
+                                                    </tr>
+
+                                                    {{-- @endforeach--}}
+                                                @endforeach
+                                            @endif
+                                            @if(isset($not_sales))
+                                                @foreach($not_sales as $not_sale)
+                                                    <tr>
+                                                        <td>{{ $not_sale->prod_code}}</td>
+                                                        <td>{{ $not_sale->name}}</td>
+                                                        <td>{{ $not_sale->uom}}</td>
+                                                        <td>{{ $not_sale->qty }}</td>
+                                                        <td>0</td>
                                                     </tr>
 
                                                     {{-- @endforeach--}}

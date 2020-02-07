@@ -28,7 +28,7 @@ class UpdateTransferHeaders extends Migration
     {
         Schema::table('transfer_headers', function (Blueprint $table) {
             //
-            $table->string('tf_code','25')-change();
+            $table->string('tf_code','25')->change();
         });
     }
 }

@@ -5,6 +5,39 @@
         </div>
         <a class='navbar-brand' href='{{url('login')}}'><!--<img src="../infoLogo.png" height='28' width='250'/>--><img src="../../img/tinuod.gif" style="height: 100%"/></a>
         <ul class="nav navbar-top-links navbar-right">
+            <li class="dropdown">
+                <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                    <i class="fa fa-bell"></i>  <span class="label label-primary">{{ $pur_count }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-alerts">
+
+                    {{-- @foreach($notify_data as $data)--}}
+                    <li>
+                        <a href="/pr_view/{{--{{$data->po_code}}--}}">
+                            <div>
+                                <i class="fa fa-cogs fa-fw"></i> Purchase Request <span class="label label-info">{{ $pr_view }}</span>{{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/notification/transfer{{--{{$data->po_code}}--}}">
+                            <div>
+                                <i class="fa fa-cog fa-fw"></i> Transfer Item <span class="label label-warning-light" style="margin-left: 3%">{{$transfer_user}}</span> {{--{{$data->po_code ." - ". $data->sup_name }}--}}
+                                <span class="pull-right text-muted small">{{ date('m/d/Y') }}</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="text-center link-block">
+                            <a href="/notifications">
+                                <strong>See All Notification</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </li>
 
             <li class="dropdown">
 

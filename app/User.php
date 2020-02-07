@@ -64,4 +64,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(TransferHeaders::class,'tf_appby','username');
     }
+    public function rqh_req_by_header()
+    {
+        return $this->hasMany(ReqHeader::class,'req_reqby','username');
+    }
+    public function rqh_check_by_header()
+    {
+        return $this->hasMany(ReqHeader::class,'req_checkby','username');
+    }
+    public function pr_reqby_header()
+    {
+        return $this->hasMany(PrHeader::class,'prh_reqby','username');
+    }
+    public function pr_appby_header()
+    {
+        return $this->hasMany(PrHeader::class,'prh_appby','username');
+    }
 }

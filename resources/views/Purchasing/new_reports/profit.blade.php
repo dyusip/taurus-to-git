@@ -2,9 +2,9 @@
 
 @section('index-content')
     <div id="wrapper">
-        @include('Management.sidebar')
+        @include('Purchasing.sidebar')
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Management.header')
+            @include('Purchasing.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>New Profit Margin Report</h2>
@@ -124,10 +124,10 @@
                                                 <th data-hide="phone,tablet" width="5%">COST</th>
                                                 <th data-hide="phone,tablet" width="5%">SRP</th>
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
-                                                <th data-hide="phone,tablet" width="5%">PRICE</th>
+                                                <th data-hide="phone,tablet" width="5%">SALES PRICE</th>
                                                 <th data-hide="phone" width="5%">LESS</th>
                                                 <th data-hide="phone,tablet" width="5%">TOTAL COST</th>
-                                                <th class="text-center" width="8%">SALES</th>
+                                                <th class="text-center" width="8%">TOTAL SALES</th>
                                                 <th class="text-center" width="8%">PROFIT</th>
                                             </tr>
                                             </thead>

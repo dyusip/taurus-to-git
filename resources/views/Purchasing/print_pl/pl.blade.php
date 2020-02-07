@@ -11,13 +11,13 @@
 
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Print Transferred Item</h2>
+                    <h2>Print Pick List</h2>
                     <ol class="breadcrumb">
                         <li>
                             <a href="/index">Home</a>
                         </li>
                         <li class="active">
-                            <strong>Print Transferred Item</strong>
+                            <strong>Print Pick List</strong>
                         </li>
                     </ol>
                 </div>
@@ -53,6 +53,7 @@
                                         <tbody class="tooltip-demo" id="order-tbl" >
                                         </tbody>
 
+
                                     </table>
                                 </div>
 
@@ -61,7 +62,10 @@
                     </div>
                 </div>
             </div>
-
+            <form id="post_form" action="/pl_print/print" method="POST" target="_blank">
+                {{csrf_field()}}
+                <input id="form_input" type="hidden" value="" name="rqh_code">
+            </form>
 
             <!-- /#page-wrapper -->
             <div class="footer">
@@ -91,18 +95,29 @@
     $('#tbl-transfer').DataTable({
         'processing': true,
         'serverSide': true,
-        'ajax': '/transferred/print/id',
+        'ajax': '/pl_print/id',
         'columns': [
-            {data: 1, name: 'transfer_headers.tf_code'},
-            {data: 12+'.name', name: 'tf_fr_branch.name'},
-            {data: 13+'.name', name: 'tf_to_branch.name'},
-            {data: 5, name: 'transfer_headers.tf_date'},
-            {data: 14+'.name', name: 'tf_prep_by.name'},
+            {data: 1, name: 'req_headers.rqh_code'},
+            {data: 11+'.name', name: 'req_from_branch.name'},
+            {data: 4, name: 'req_headers.req_date'},
+            {data: 13+'.name', name: 'rqh_req_by.name'},
             /* {data: 14+'.name', name: 'tf_app_by.name'},*/
-            {data: 15, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
+            {data: 14, name: 'action', orderable: false, searchable: false, 'class':'text-center'}
 
         ],
         "order": [[3, 'desc']]
+    });
+</script>
+<script type="text/javascript" language="javascript">
+    /*function post_link(data){
+
+        $('#post_form').find('#form_input').val(data);
+        $('#post_form').submit();
+    }*/
+    $(document).on('click','#btn-edit',function () {
+        var data = $(this).data('id');
+        $('#post_form').find('#form_input').val(data);
+        $('#post_form').submit();
     });
 </script>
 @endpush

@@ -2,9 +2,9 @@
 
 @section('index-content')
     <div id="wrapper">
-        @include('Management.sidebar')
+        @include('Purchasing.sidebar')
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Management.header')
+            @include('Purchasing.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>Taurus New CW Deliveries Report</h2>
@@ -126,7 +126,7 @@
                                                 <th data-hide="phone" width="5%">COST</th>
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
                                                 <th data-hide="phone,tablet" width="5%">SRP</th>
-                                                <th class="text-center" width="8%">AMOUNT</th>
+                                                <th class="text-center" width="8%">TOTAL COST</th>
                                             </tr>
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">

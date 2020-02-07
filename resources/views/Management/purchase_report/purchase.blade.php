@@ -131,9 +131,9 @@
                                                             <td>{{ $story->prod_code }}</td>
                                                             <td>{{ $story->prod_name }}</td>
                                                             <td>{{ $story->prod_qty }}</td>
-                                                            <td>{{ Number_Format($story->prod_price,2) }}</td>
+                                                            <td>{!! Number_Format($story->prod_price, 2) !!}</td>
                                                             <td>{{ $story->prod_less }}%</td>
-                                                            <td>{{ $story->prod_amount }}</td>
+                                                            <td>{!! Number_Format($story->prod_amount, 2) !!}</td>
                                                         </tr>
                                                         @php $total += $story->prod_amount; @endphp
                                                     @endforeach

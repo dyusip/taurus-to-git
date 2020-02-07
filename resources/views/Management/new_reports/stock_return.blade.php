@@ -7,7 +7,7 @@
             @include('Management.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Taurus Stock Return Report</h2>
+                    <h2>Taurus New Stock Return Report</h2>
                     <ol class="breadcrumb">
                         <li>
                             <a href="dashboard.php">Home</a>
@@ -16,7 +16,7 @@
                             <a>Taurus</a>
                         </li>
                         <li class="active">
-                            <strong>Taurus Stock Return Report</strong>
+                            <strong>Taurus New Stock Return Report</strong>
                         </li>
                     </ol>
                 </div>
@@ -48,7 +48,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <form role="form" action="/stock_return" method="post" name="myform" id="myform">
+                            <form role="form" action="/nr_stock_return" method="post" name="myform" id="myform">
                                 <div class="ibox-content">
                                     {{ csrf_field() }}
                                     <p>Show report by</p>
@@ -108,7 +108,7 @@
                                     </div>--}}
                                 </div>
                                 <div class="ibox-content tooltip-demo">
-                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/stock_return/print">
+                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/nr_stock_return/print">
                                         <span aria-hidden="true" class="fa fa-print fa-5x"></span>
                                     </button>
 
@@ -125,7 +125,7 @@
                                                 <th data-hide="phone" width="23%">NAME</th>
                                                 <th data-hide="phone" width="5%">COST</th>
                                                 <th data-hide="phone,tablet" width="5%">QTY</th>
-                                                <th data-hide="phone,tablet" width="5%">PRICE</th>
+                                                <th data-hide="phone,tablet" width="5%">SRP</th>
                                                 <th class="text-center" width="8%">AMOUNT</th>
                                             </tr>
                                             </thead>

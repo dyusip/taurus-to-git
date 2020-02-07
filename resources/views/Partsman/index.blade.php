@@ -131,6 +131,59 @@
                             </div>
                         </div>
                     </div>
+                    <!--End of Search -->
+                    <div class="row">
+                        <div class="col-md-12">
+
+
+                            <div class="ibox">
+                                <div class="ibox-title">
+                                    <h5>Sales Report</h5>
+                                    <!--<div class="ibox-tools">
+                                        <a href="" class="btn btn-primary btn-xs">Create new project</a>
+                                    </div>-->
+                                </div>
+                                <div class="ibox-content">
+                                    <div class="btn-group">
+                                        <button class="btn btn-white btn-sm previous" id="prev" onclick="prevMonth()"><i
+                                                    class="fa fa-chevron-left"></i></button>
+                                        <span class="current"></span>
+                                        <button class="btn btn-white btn-sm next" id="next" onclick="nextMonth()"><i
+                                                    class="fa fa-chevron-right"></i></button>
+                                    </div>
+                                    <button type="button" id="btn-month"
+                                            class="fc-today-button fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled"
+                                            disabled="disabled">{{ Carbon\Carbon::now()->format('F Y') }}</button>
+                                    <button type="button" id="btn-today"
+                                            class="fc-today-button fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled">Today {{ Carbon\Carbon::now()->format('F d, Y') }}</button>
+                                    <input type="hidden" id="dt-month" value="{{ Carbon\Carbon::now()->format('Y-n') }}">
+                                    <div class="clearfix"></div>
+                                    <div class="row">
+
+                                        <div class="col-md-7 b-r">
+                                            <table class="table table-hover no-margins">
+                                                <thead>
+                                                <tr>
+                                                    <th>Branch</th>
+                                                    <th width="25%">Goal</th>
+                                                    <th>Sales</th>
+                                                    <th>Perf</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="performance">
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div id="morris-donut-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End of Sales Report-->
                 </div>
             </div>
         </div>
@@ -152,8 +205,13 @@
 <!-- jQuery -->
 
 @endsection
+@push('styles')
+<link href="{{  asset('css/plugins/morris/morris-0.4.3.min.css') }}" rel="stylesheet">
+@endpush
 @push('scripts')
 <script src="{{  asset('/js/plugins/typehead/bootstrap3-typehead.min.js') }}"></script>
+<script src="{{  asset('js/plugins/morris/raphael-2.1.0.min.js') }}"></script>
+<script src="{{  asset('js/plugins/morris/morris.js') }}"></script>
 <script>
    /*$(document).on('click','#btn-search',function () {
        var item = $('#typeahead_2').val();
@@ -210,5 +268,107 @@
    $('form input').on('keypress', function(e) {
        return e.which !== 13;
    });
+</script>
+<script>
+    $(document).ready(function () {
+        var d = new Date($('#dt-month').val());
+        d.setDate(1);
+        d.setMonth(d.getMonth() ,1);
+        var first = d.getMonth()+1 + "-" + d.getDate() + "-" + d.getFullYear();
+        d.setMonth(d.getMonth() +1,0);
+        var last = d.getMonth()+1 + "-" + d.getDate() + "-" + d.getFullYear();
+        Donut_chart(first,last)
+    });
+    function Donut_chart(first, last) {
+        $.ajax({
+            url : '/home/salesreport/'+first+"/"+last,
+            beforeSend: function() {
+                $('#main-spinner').fadeIn();
+            },
+            success: function (data) {
+                $('#main-spinner').fadeOut();
+                var val = [];
+                $('#performance').html("");
+                $.each(data, function (index, value) {
+                    val.push({'label' : value.so_branch.name, 'value': value.total.toFixed(1)});
+                    var goal = (Number(value.total) / value.so_branch.goal) * 100;
+                    goal = Number.isInteger(goal)?goal:goal.toFixed(1);
+                    $('#performance').append(" <tr> " +
+                        "<td><small>"+ value.so_branch.name +"</small></td> " +
+                        "<td width='20%'> <input type='text' class='form-control' id='goal' value='"+value.so_branch.goal+"'></td> " +
+                        "<td id='sales'>"+ formatDollar(value.total) +"</td> " +
+                        "<td class='text-navy'> <i class='fa fa-level-up'></i> <span id='perf'>"+ Math.round(goal)+"%</span> </td> " +
+                        "</tr>")
+                });
+                console.log(val.length);
+                var color = [];
+                var pick = ['#87d6c6', '#54cdb4','#1ab394', '#37afbd',
+                    '#53b5ad', '#16acba','#47c5d1','#42f4d7','#37725c',
+                    '#106344','#9bf2e6','#10e8ca','#5dc5e2','#94dbef',
+                    '#94efdd','#509184','#26574d','#268c80','#05a18e',
+                    '#11bdbd','#3eadad','#19e3bb','#104f4f'];
+
+                for (var i = 0; i < val.length;i++) {
+                    color.push(pick[i])
+                }
+                $('#morris-donut-chart').empty();
+                Morris.Donut({
+                    element: 'morris-donut-chart',
+                    data: val,
+                    resize: true,
+                    colors: color
+                });
+            }
+        });
+    }
+    function formatDollar(num) {
+        var p = num.toFixed(2).split(".");
+        return "₱" + p[0].split("").reverse().reduce(function(acc, num, i, orig) {
+                return  num=="-" ? acc : num + (i && !(i % 3) ? "," : "") + acc;
+            }, "") + "." + p[1];
+    }
+
+    var month = new Array();
+    month = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    $(document).on('click','#btn-today',function () {
+        var today = new Date();
+        var date = (today.getMonth()+1)+'-'+today.getDate()+'-'+today.getFullYear();
+        Donut_chart(date,date)
+    });
+
+    function prevMonth() {
+        var d = new Date($('#dt-month').val());
+        d.setDate(1);
+        d.setMonth(d.getMonth() - 1);
+        var first = d.getMonth()+1 + "-" + d.getDate() + "-" + d.getFullYear();
+        d.setMonth(d.getMonth() +1,0);
+        var last = d.getMonth()+1 + "-" + d.getDate() + "-" + d.getFullYear();
+        $('#dt-month').val(d.getFullYear() + "-"+ (d.getMonth() + 1));
+        $('#btn-month').text(month[d.getMonth()]+" "+d.getFullYear());
+        Donut_chart(first,last)
+    }
+    function nextMonth() {
+        var d = new Date($('#dt-month').val());
+        d.setDate(1);
+        d.setMonth(d.getMonth() + 1);
+        var first = d.getMonth()+1 + "-" + d.getDate() + "-" + d.getFullYear();
+        d.setMonth(d.getMonth() +1,0);
+        var last = d.getMonth()+1 + "-" + d.getDate() + "-" + d.getFullYear();
+        $('#dt-month').val(d.getFullYear() + "-"+ (d.getMonth() + 1));
+        $('#btn-month').text(month[d.getMonth()]+" "+d.getFullYear());
+        Donut_chart(first,last)
+    }
+    $('tbody').delegate('#goal','keyup',function () {
+        var tr = $(this).parent().parent();
+        var goal = $(this).val();
+        var sales = tr.find('#sales').text();
+        sales = Number(sales.replace(/[^0-9\.]+/g,""));
+        var perf = (Number(sales) / Number(goal)) * 100;
+        perf = Number.isInteger(perf)?perf:perf.toFixed(1);
+        tr.find('#perf').html(Math.round(perf)+"%");
+    });
+
 </script>
 @endpush

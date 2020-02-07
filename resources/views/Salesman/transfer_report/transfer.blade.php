@@ -123,7 +123,7 @@
                                             </thead>
                                             <tbody id="order-tbl" class="tooltip-demo">
                                             @if(isset($items))
-                                                @php $total = 0; @endphp
+                                                {{--@php $total = 0; @endphp
                                                 @foreach($items as $item)
                                                     @foreach($item->tf_detail as $story)
                                                         <tr>
@@ -141,6 +141,26 @@
                                                             $total += $story->tf_prod_amount;
                                                         @endphp
                                                     @endforeach
+                                                @endforeach--}}
+                                                @php $total = 0; @endphp
+                                                @foreach($items as $item)
+                                                    @php $amount = $item->tf_prod_qty * $item->srp; @endphp
+                                                    <tr>
+                                                        <td>{{ $item->tf_code }}</td>
+                                                        <td>{{ $item->from_branch }}</td>
+                                                        <td>{{ $item->to_branch }}</td>
+                                                        <td>{{ $item->tf_date }}</td>
+                                                        <td>{{ $item->tf_prod_code }}</td>
+                                                        <td>{{ $item->tf_prod_name }}</td>
+                                                       {{-- <td>{{ Number_Format($item->tf_prod_price,2) }}</td>--}}
+                                                        <td>{{ $item->tf_prod_qty }}</td>
+                                                        <td>{{ $item->srp }}</td>
+                                                        <td>{{ Number_Format($amount,2) }}</td>
+                                                    </tr>
+                                                    @php
+                                                        $total += $amount;
+                                                    @endphp
+
                                                 @endforeach
                                             @endif
                                             </tbody>

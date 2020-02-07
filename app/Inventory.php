@@ -18,6 +18,10 @@ class Inventory extends Model
     {
         return $this->hasMany(Branch_Inventory::class,'prod_code','code');
     }
+    public function bi_replicate()
+    {
+        return $this->hasMany(BiReplicate::class,'bir_prod_code','code');
+    }
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = strtoupper($value);

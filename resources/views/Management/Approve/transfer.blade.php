@@ -219,12 +219,17 @@
 @push('scripts')
 <script src="{{ asset('js/plugins/select2/select2.full.min.js') }}"></script>
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
-{{--<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>--}}
+<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>
 <!--ladda-->
 <script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
 <script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
 <script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 <script>
+    @if (session('status'))
+        $(document).ready(function () {
+            toastr.success("{{ session('status') }}");
+        });
+    @endif
     $(document).ready(function() {
         datatable();
     });
@@ -254,6 +259,22 @@
     }
     $(document).ready(function () {
         Choosen();
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "progressBar": true,
+            "preventDuplicates": true,
+            "positionClass": "toast-top-right",
+            "onclick": null,
+            "showDuration": "400",
+            "hideDuration": "1000",
+            "timeOut": "7000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
     });
     function Choosen() {
         $(".select2_demo_1").select2();
@@ -321,12 +342,5 @@
         var l = $( '.ladda-button-demo' ).ladda();
         l.ladda( 'start' );
     });
-</script>
-<script type="text/javascript">
-    @if (session('status'))
-        $(document).ready(function () {
-        toastr.success("{{ session('status') }}");
-    });
-    @endif
 </script>
 @endpush

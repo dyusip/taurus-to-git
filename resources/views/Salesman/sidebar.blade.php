@@ -10,7 +10,7 @@
                              </span>
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                             <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold"> {{ Auth::user()->name }} </strong>
-                             </span> <span class="text-muted text-xs block"> {{ Auth::user()->position }}  <b class="caret"></b></span> </span> </a>
+                             </span> <span class="text-muted text-xs block"> {{ Auth::user()->position }} - {{ Auth::user()->branch_user->name }}  <b class="caret"></b></span> </span> </a>
                     <ul class="dropdown-menu animated fadeInRight m-t-xs">
                         <li><a href="profile">Profile</a></li>
                         <li><a href="contacts.html">Contacts</a></li>
@@ -28,8 +28,12 @@
             <li>{{--{!! (Request::is('home') ? 'class="active"' : '') !!}--}}
                 <a href="{{ url('/home') }}"><i class="fa fa-th-large"></i> <span class="nav-label">Home</span> </a>
             </li>
-            <li>{{--{!! (Request::is('inventory/create') ? 'class="active"' : '') !!}--}}
-                <a href="{{ url('/salesman/inventory') }}"><i class="fa fa-cubes"></i> <span class="nav-label">Inventory</span></a>
+            <li>
+                <a href="javascript:;"><i class="fa fa-cubes"></i> <span class="nav-label">Inventory</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <li><a href="{{ url('/salesman/inventory') }}">View</a></li>
+                    <!--<li><a href="{{ url('/sr/create') }}">Request</a></li>-->
+                </ul>
             </li>
             <li>
                 <a href="javascript:;"><i class="fa fa-shopping-cart"></i> <span class="nav-label">Sales Order</span><span class="fa arrow"></span></a>

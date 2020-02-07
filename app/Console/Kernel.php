@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        Commands\InventoryCapture::class,
+        Commands\ReplicateInventory::class,
     ];
 
     /**
@@ -26,6 +28,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('inventory:capture --force')->daily();
+        $schedule->command('replicate:inventory --force')->daily();
+        
     }
 
     /**

@@ -68,7 +68,7 @@ class SrReportController extends Controller
                     'SR CODE' => $sale->sr_code,
                     'SR DATE' => $sale->sr_date,
                     'SO CODE' => $sale->so_code,
-                    'SO DATE' => $sale->so_date,
+                    'SO DATE' => $sale->sr_so_header->so_date,
                     'ITEM CODE' => $story->srd_prod_code,
                     'NAME' => $story->srd_prod_name,
                     'QTY' => $story->srd_prod_qty,

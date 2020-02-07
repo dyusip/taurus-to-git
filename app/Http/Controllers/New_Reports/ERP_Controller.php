@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\ERP_Report;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\InvPosition;
@@ -32,7 +32,7 @@ class ERP_Controller extends Controller
     function index()
     {
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.erp_report.erp',compact('branches'));
+        return view($this->position().'.new_reports.erp',compact('branches'));
     }
     function show(Request $request)
     {
@@ -47,101 +47,63 @@ class ERP_Controller extends Controller
             $cw = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('from_branch,SUM(bri.cost * tf_prod_qty) as total_cw_cost, SUM(bri.price * tf_prod_qty) as total_cw_srp'))
+                ->select(DB::raw('from_branch,SUM(tf_prod_cost * tf_prod_qty) as total_cw_cost, SUM(tf_prod_srp * tf_prod_qty) as total_cw_srp'))
                 ->groupBy('from_branch')
                 ->first();
             $tf_in = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','!=','TR-BR00001')->where('to_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('SUM(bri.cost * tf_prod_qty) as total_tf_in_cost, SUM(bri.price * tf_prod_qty) as total_tf_in_srp'))
+                ->select(DB::raw('SUM(tf_prod_cost * tf_prod_qty) as total_tf_in_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_in_srp'))
                 //->groupBy('from_branch')
                 ->first();
             $sales = SoHeader::whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('SUM(bri.cost * sod_prod_qty) as total_so_cost, 
+                ->select(DB::raw('SUM(sod_prod_cost * sod_prod_qty) as total_so_cost, 
                 SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_so_srp'))
                 //->groupBy('branch_code')
                 ->first();
             $tf_out = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','!=','TR-BR00001')->where('to_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('SUM(bri.cost * tf_prod_qty) as total_tf_out_cost, SUM(bri.price * tf_prod_qty) as total_tf_out_srp'))
-                //->groupBy('from_branch')
+                ->select(DB::raw('SUM(tf_prod_cost * tf_prod_qty) as total_tf_out_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_out_srp'))
                 ->first();
             $return = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','!=','TR-BR00001')->where('to_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('SUM(bri.cost * tf_prod_qty) as total_return_cost, SUM(bri.price * tf_prod_qty) as total_return_srp'))
+                ->select(DB::raw('SUM(tf_prod_cost * tf_prod_qty) as total_return_cost, SUM(tf_prod_srp * tf_prod_qty) as total_return_srp'))
                 //->groupBy('from_branch')
                 ->first();
             $sales_return = SrHeader::whereBetween('sr_date', [$from, $to])
                 ->join('so_headers as soh','soh.so_code','=','sr_headers.so_code')
                 ->join('sr_details as srd','srd.srd_code','=','sr_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'srd.srd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','soh.branch_code');
-                })
-                ->select(DB::raw('soh.branch_code, SUM(bri.cost * srd.srd_prod_qty) as total_so_return_cost, 
+                ->select(DB::raw('soh.branch_code, SUM(srd_prod_cost * srd.srd_prod_qty) as total_so_return_cost, 
                 SUM(srd_prod_price * srd_prod_qty - ((srd.srd_prod_price * srd_prod_qty) * (srd_less/100))) as total_so_return_srp'))
                 ->groupBy('branch_code')
                 ->first();
             $sales_disc = SoHeader::whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('SUM(bri.price * sod_prod_qty) as total_sd_srp,
-                (SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(bri.price * sod_prod_qty) * 100)  as total_so_disc_cost, 
-                SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp'))
+                ->select(DB::raw('SUM(sod_prod_srp * sod_prod_qty) as total_sd_srp,
+                (SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(sod_prod_srp * sod_prod_qty) * 100)  as total_so_disc_cost, 
+                SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as pos_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) as pos_disc,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as neg_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) as neg_disc'))
                 //->groupBy('branch_code')
                 ->first();
             $misc_in = MiscHeader::whereBetween('msh_date',[$from, $to])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
-                    ->where(['msd_remarks' => 'IN']);
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
+                        ->where(['msd_remarks' => 'IN']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_in_cost, SUM(bri.price * msd.msd_prod_qty) as misc_in_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_in_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_in_srp'))
                 ->first();
             $misc_out = MiscHeader::whereBetween('msh_date',[$from, $to])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'OUT']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_out_cost, SUM(bri.price * msd.msd_prod_qty) as misc_out_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_out_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_out_srp'))
                 ->first();
             //echo $tf_out;
             $end_inv = InvPosition::where(['ip_date' => $to])
@@ -157,56 +119,31 @@ class ERP_Controller extends Controller
             $cw = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('to_branch','=',$request->branch)->where('from_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('to_branch, SUM(bri.cost * tf_prod_qty) as total_cw_cost, SUM(bri.price * tf_prod_qty) as total_cw_srp'))
+                ->select(DB::raw('to_branch, SUM(tf_prod_cost * tf_prod_qty) as total_cw_cost, SUM(tf_prod_srp * tf_prod_qty) as total_cw_srp'))
                 ->groupBy('to_branch')
                 ->first();
             $tf_in = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('to_branch','=',$request->branch)->where('from_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('to_branch, SUM(bri.cost * tf_prod_qty) as total_tf_in_cost, SUM(bri.price * tf_prod_qty) as total_tf_in_srp'))
+                ->select(DB::raw('to_branch, SUM(tf_prod_cost * tf_prod_qty) as total_tf_in_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_in_srp'))
                 ->groupBy('to_branch')
                 ->first();
             $sales = SoHeader::where(['so_headers.branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('so_headers.branch_code, SUM(bri.cost * sod_prod_qty) as total_so_cost, 
+                ->select(DB::raw('so_headers.branch_code, SUM(sod_prod_cost * sod_prod_qty) as total_so_cost, 
                 SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_so_srp'))
                 ->groupBy('branch_code')
                 ->first();
             $tf_out = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','=',$request->branch)->where('to_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('from_branch, SUM(bri.cost * tf_prod_qty) as total_tf_out_cost, SUM(bri.price * tf_prod_qty) as total_tf_out_srp'))
+                ->select(DB::raw('from_branch, SUM(tf_prod_cost * tf_prod_qty) as total_tf_out_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_out_srp'))
                 ->groupBy('from_branch')
                 ->first();
             $return = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','=',$request->branch)->where('to_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('from_branch, SUM(bri.cost * tf_prod_qty) as total_return_cost, SUM(bri.price * tf_prod_qty) as total_return_srp'))
+                ->select(DB::raw('from_branch, SUM(tf_prod_cost * tf_prod_qty) as total_return_cost, SUM(tf_prod_srp * tf_prod_qty) as total_return_srp'))
                 ->groupBy('from_branch')
                 ->first();
             $branch = $request->branch;
@@ -216,47 +153,35 @@ class ERP_Controller extends Controller
                         ->where('soh.branch_code','=',$branch);
                 })
                 ->join('sr_details as srd','srd.srd_code','=','sr_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'srd.srd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','soh.branch_code');
-                })
-                ->select(DB::raw('soh.branch_code, SUM(bri.cost * srd.srd_prod_qty) as total_so_return_cost, 
+                ->select(DB::raw('soh.branch_code, SUM(srd_prod_cost * srd.srd_prod_qty) as total_so_return_cost, 
                 SUM(srd_prod_price * srd_prod_qty - ((srd.srd_prod_price * srd_prod_qty) * (srd_less/100))) as total_so_return_srp'))
                 ->groupBy('branch_code')
                 ->first();
             $sales_disc = SoHeader::where(['so_headers.branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
                 ->select(DB::raw('so_headers.branch_code, 
-                (SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(bri.price * sod_prod_qty) * 100)  as total_so_disc_cost, 
-                SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp'))
+                (SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(sod_prod_srp * sod_prod_qty) * 100)  as total_so_disc_cost, 
+                SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as pos_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) as pos_disc,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as neg_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) as neg_disc'))
                 ->groupBy('branch_code')
                 ->first();
             $misc_in = MiscHeader::whereBetween('msh_date',[$from, $to])->where(['msh_branch_code' => $request->branch])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'IN']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_in_cost, SUM(bri.price * msd.msd_prod_qty) as misc_in_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_in_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_in_srp'))
                 ->groupBy('msh_branch_code')
                 ->first();
             $misc_out = MiscHeader::whereBetween('msh_date',[$from, $to])->where(['msh_branch_code' => $request->branch])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'OUT']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_out_cost, SUM(bri.price * msd.msd_prod_qty) as misc_out_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_out_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_out_srp'))
                 ->groupBy('msh_branch_code')
                 ->first();
             $end_inv = InvPosition::where(['ip_date' => $to])->where(['ip_branch_code' => $request->branch])
@@ -265,7 +190,7 @@ class ERP_Controller extends Controller
         }
 
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.erp_report.erp',compact('branches','inv_beg','cw','request','tf_in','sales','tf_out','sales_disc','return','misc_in','misc_out','end_inv','sales_return'));
+        return view($this->position().'.new_reports.erp',compact('branches','inv_beg','cw','request','tf_in','sales','tf_out','sales_disc','return','misc_in','misc_out','end_inv','sales_return'));
     }
     function print_report(Request $request)
     {
@@ -280,102 +205,65 @@ class ERP_Controller extends Controller
             $cw = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('from_branch,SUM(bri.cost * tf_prod_qty) as total_cw_cost, SUM(bri.price * tf_prod_qty) as total_cw_srp'))
+                ->select(DB::raw('from_branch,SUM(tf_prod_cost * tf_prod_qty) as total_cw_cost, SUM(tf_prod_srp * tf_prod_qty) as total_cw_srp'))
                 ->groupBy('from_branch')
                 ->first();
             $tf_in = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','!=','TR-BR00001')->where('to_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('SUM(bri.cost * tf_prod_qty) as total_tf_in_cost, SUM(bri.price * tf_prod_qty) as total_tf_in_srp'))
+                ->select(DB::raw('SUM(tf_prod_cost * tf_prod_qty) as total_tf_in_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_in_srp'))
                 //->groupBy('from_branch')
                 ->first();
             $sales = SoHeader::whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('SUM(bri.cost * sod_prod_qty) as total_so_cost, 
+                ->select(DB::raw('SUM(sod_prod_cost * sod_prod_qty) as total_so_cost, 
                 SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_so_srp'))
                 //->groupBy('branch_code')
                 ->first();
             $tf_out = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','!=','TR-BR00001')->where('to_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('SUM(bri.cost * tf_prod_qty) as total_tf_out_cost, SUM(bri.price * tf_prod_qty) as total_tf_out_srp'))
-                //->groupBy('from_branch')
+                ->select(DB::raw('SUM(tf_prod_cost * tf_prod_qty) as total_tf_out_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_out_srp'))
                 ->first();
             $return = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','!=','TR-BR00001')->where('to_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('SUM(bri.cost * tf_prod_qty) as total_return_cost, SUM(bri.price * tf_prod_qty) as total_return_srp'))
+                ->select(DB::raw('SUM(tf_prod_cost * tf_prod_qty) as total_return_cost, SUM(tf_prod_srp * tf_prod_qty) as total_return_srp'))
                 //->groupBy('from_branch')
                 ->first();
             $sales_return = SrHeader::whereBetween('sr_date', [$from, $to])
                 ->join('so_headers as soh','soh.so_code','=','sr_headers.so_code')
                 ->join('sr_details as srd','srd.srd_code','=','sr_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'srd.srd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','soh.branch_code');
-                })
-                ->select(DB::raw('soh.branch_code, SUM(bri.cost * srd.srd_prod_qty) as total_so_return_cost, 
+                ->select(DB::raw('soh.branch_code, SUM(srd_prod_cost * srd.srd_prod_qty) as total_so_return_cost, 
                 SUM(srd_prod_price * srd_prod_qty - ((srd.srd_prod_price * srd_prod_qty) * (srd_less/100))) as total_so_return_srp'))
                 ->groupBy('branch_code')
                 ->first();
             $sales_disc = SoHeader::whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('(SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(bri.price * sod_prod_qty) * 100)  as total_so_disc_cost, 
-                SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp'))
+                ->select(DB::raw('SUM(sod_prod_srp * sod_prod_qty) as total_sd_srp,
+                (SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(sod_prod_srp * sod_prod_qty) * 100)  as total_so_disc_cost, 
+                SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as pos_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) as pos_disc,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as neg_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) as neg_disc'))
                 //->groupBy('branch_code')
                 ->first();
-            //echo $tf_out;
             $misc_in = MiscHeader::whereBetween('msh_date',[$from, $to])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'IN']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_in_cost, SUM(bri.price * msd.msd_prod_qty) as misc_in_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_in_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_in_srp'))
                 ->first();
             $misc_out = MiscHeader::whereBetween('msh_date',[$from, $to])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'OUT']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_out_cost, SUM(bri.price * msd.msd_prod_qty) as misc_out_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_out_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_out_srp'))
                 ->first();
+            //echo $tf_out;
             $end_inv = InvPosition::where(['ip_date' => $to])
                 ->select(DB::raw('SUM(ip_cost) as ip_cost, SUM(ip_srp) as ip_srp'))
                 ->first();
@@ -389,56 +277,31 @@ class ERP_Controller extends Controller
             $cw = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('to_branch','=',$request->branch)->where('from_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('to_branch, SUM(bri.cost * tf_prod_qty) as total_cw_cost, SUM(bri.price * tf_prod_qty) as total_cw_srp'))
+                ->select(DB::raw('to_branch, SUM(tf_prod_cost * tf_prod_qty) as total_cw_cost, SUM(tf_prod_srp * tf_prod_qty) as total_cw_srp'))
                 ->groupBy('to_branch')
                 ->first();
             $tf_in = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('to_branch','=',$request->branch)->where('from_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('to_branch, SUM(bri.cost * tf_prod_qty) as total_tf_in_cost, SUM(bri.price * tf_prod_qty) as total_tf_in_srp'))
+                ->select(DB::raw('to_branch, SUM(tf_prod_cost * tf_prod_qty) as total_tf_in_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_in_srp'))
                 ->groupBy('to_branch')
                 ->first();
             $sales = SoHeader::where(['so_headers.branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('so_headers.branch_code, SUM(bri.cost * sod_prod_qty) as total_so_cost, 
+                ->select(DB::raw('so_headers.branch_code, SUM(sod_prod_cost * sod_prod_qty) as total_so_cost, 
                 SUM(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) as total_so_srp'))
                 ->groupBy('branch_code')
                 ->first();
             $tf_out = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','=',$request->branch)->where('to_branch','!=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('from_branch, SUM(bri.cost * tf_prod_qty) as total_tf_out_cost, SUM(bri.price * tf_prod_qty) as total_tf_out_srp'))
+                ->select(DB::raw('from_branch, SUM(tf_prod_cost * tf_prod_qty) as total_tf_out_cost, SUM(tf_prod_srp * tf_prod_qty) as total_tf_out_srp'))
                 ->groupBy('from_branch')
                 ->first();
             $return = TransferHeaders::where(['tf_status' => 'AP'])->whereBetween('tf_date', [$from, $to])
                 ->where('from_branch','=',$request->branch)->where('to_branch','=','TR-BR00001')
                 ->join('transfer_details as tf','tf.td_code','=','tf_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'tf.tf_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','from_branch');
-                })
-                ->select(DB::raw('from_branch, SUM(bri.cost * tf_prod_qty) as total_return_cost, SUM(bri.price * tf_prod_qty) as total_return_srp'))
+                ->select(DB::raw('from_branch, SUM(tf_prod_cost * tf_prod_qty) as total_return_cost, SUM(tf_prod_srp * tf_prod_qty) as total_return_srp'))
                 ->groupBy('from_branch')
                 ->first();
             $branch = $request->branch;
@@ -448,47 +311,35 @@ class ERP_Controller extends Controller
                         ->where('soh.branch_code','=',$branch);
                 })
                 ->join('sr_details as srd','srd.srd_code','=','sr_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'srd.srd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','soh.branch_code');
-                })
-                ->select(DB::raw('soh.branch_code, SUM(bri.cost * srd.srd_prod_qty) as total_so_return_cost, 
+                ->select(DB::raw('soh.branch_code, SUM(srd_prod_cost * srd.srd_prod_qty) as total_so_return_cost, 
                 SUM(srd_prod_price * srd_prod_qty - ((srd.srd_prod_price * srd_prod_qty) * (srd_less/100))) as total_so_return_srp'))
                 ->groupBy('branch_code')
                 ->first();
             $sales_disc = SoHeader::where(['so_headers.branch_code' => $request->branch])->whereBetween('so_date', [$from, $to])
                 ->join('so_details as sod','sod.sod_code','=','so_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'sod.sod_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','so_headers.branch_code');
-                })
-                ->select(DB::raw('so_headers.branch_code,
-                (SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(bri.price * sod_prod_qty) * 100)  as total_so_disc_cost, 
-                SUM((bri.price * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp'))
+                ->select(DB::raw('so_headers.branch_code, 
+                (SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) / sum(sod_prod_srp * sod_prod_qty) * 100)  as total_so_disc_cost, 
+                SUM((sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100)))) as total_so_disc_srp,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as pos_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) > (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_srp * sod_prod_qty) - (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),0)) as pos_disc,
+                (SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) / sum(sod_prod_srp * sod_prod_qty) * 100) as neg_disc_perc,
+                SUM(IF((sod_prod_srp * sod_prod_qty) < (sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))),(sod_prod_price * sod_prod_qty - ((sod_prod_price * sod_prod_qty) * (sod_less/100))) - (sod_prod_srp * sod_prod_qty),0)) as neg_disc'))
                 ->groupBy('branch_code')
                 ->first();
             $misc_in = MiscHeader::whereBetween('msh_date',[$from, $to])->where(['msh_branch_code' => $request->branch])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'IN']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_in_cost, SUM(bri.price * msd.msd_prod_qty) as misc_in_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_in_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_in_srp'))
                 ->groupBy('msh_branch_code')
                 ->first();
             $misc_out = MiscHeader::whereBetween('msh_date',[$from, $to])->where(['msh_branch_code' => $request->branch])
-                ->join('misc_details as msd','msd.msd_code','=','msh_code')
-                ->join('branch__inventories as bri', function ($join) use($from) {
-                    $join->on('bri.prod_code', '=', 'msd.msd_prod_code');
-                    //$join->on('bri.branch_code','=','to_branch');
-                    $join->on('bri.branch_code','=','msh_branch_code')
+                ->join('misc_details as msd', function ($join) use($from) {
+                    $join->on('msd.msd_code','=','msh_code')
                         ->where(['msd_remarks' => 'OUT']);
                 })
-                ->select(DB::raw('SUM(bri.cost * msd.msd_prod_qty) as misc_out_cost, SUM(bri.price * msd.msd_prod_qty) as misc_out_srp'))
+                ->select(DB::raw('SUM(msd_prod_cost* msd.msd_prod_qty) as misc_out_cost, SUM(msd_prod_price * msd.msd_prod_qty) as misc_out_srp'))
                 ->groupBy('msh_branch_code')
                 ->first();
             $end_inv = InvPosition::where(['ip_date' => $to])->where(['ip_branch_code' => $request->branch])
@@ -524,10 +375,18 @@ class ERP_Controller extends Controller
             $branch => 'Stock Returns',
             'COST' => @$return->total_return_cost,
             'SRP' => @$return->total_return_srp
-        ],[
+        ]/*,[
             $branch => 'Discount',
             'COST' => Number_Format(@$sales_disc->total_so_disc_cost,2)."%",
             'SRP' => @$sales_disc->total_so_disc_srp
+        ]*/,[
+            $branch => 'Positive Discount',
+            'COST' => Number_Format(@$sales_disc->pos_disc_perc,2)."%",
+            'SRP' => @$sales_disc->pos_disc
+        ],[
+            $branch => 'Negative Discount',
+            'COST' => Number_Format(@$sales_disc->neg_disc_perc,2)."%",
+            'SRP' => @$sales_disc->neg_disc
         ],[
             $branch => 'Miscellaneous IN',
             'COST' => @$misc_in->misc_in_cost,
@@ -538,10 +397,10 @@ class ERP_Controller extends Controller
             'SRP' => @$misc_out->misc_out_srp
         ]
         ,[
-            $branch => 'End Inv',
-            'COST' => @$end_inv->ip_cost,
-            'SRP' => @$end_inv->ip_srp
-        ]);
+                $branch => 'End Inv',
+                'COST' => @$end_inv->ip_cost,
+                'SRP' => @$end_inv->ip_srp
+            ]);
 
         return Excel::create('Taurus Enterprise Block Box Report', function($excel) use ($data) {
             $excel->setTitle('Taurus Enterprise Block Box Report');

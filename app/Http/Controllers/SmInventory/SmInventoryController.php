@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Yajra\Datatables\Datatables;
-
+use Excel;
 class SmInventoryController extends Controller
 {
     //
@@ -50,5 +50,54 @@ class SmInventoryController extends Controller
 
         return redirect('/salesman/inventory')->with('status', "Product {$inventory->firstOrFail()->inventory->name} successfully updated");
     }
+    public function print_inventory($id)
+    {
+        //
+        $inventories = Branch_Inventory::where(['branch_code' => $id])->get();
+        $data = array();
+        foreach ($inventories as $inventory){
+            $branch = $inventory->branch->name;
+            if(Auth::user()->position == 'CEO'){
+                $data[] = [
+                    'ITEM CODE' => $inventory->inventory->code,
+                    'NAME' => $inventory->inventory->name,
+                    'DESCRIPTION' => $inventory->inventory->desc,
+                    'UOM' => $inventory->inventory->uom,
+                    'COST' => $inventory->cost,
+                    'QUANTITY' => $inventory->quantity,
+                    'SRP' => $inventory->price,
+                ];
+            }else{
+                $data[] = [
+                    'ITEM CODE' => $inventory->inventory->code,
+                    'NAME' => $inventory->inventory->name,
+                    'DESCRIPTION' => $inventory->inventory->desc,
+                    'UOM' => $inventory->inventory->uom,
+                    /*'COST' => $inventory->cost,*/
+                    'QUANTITY' => $inventory->quantity,
+                    'SRP' => $inventory->price,
+                ];
+            }
+        }
 
+        return Excel::create('Taurus Inventory Report', function($excel) use ($data, $branch) {
+            $excel->setTitle('Taurus Inventory Report');
+            $excel->sheet('Inventory Report', function($sheet) use ($data, $branch)
+            {
+                $sheet->fromArray($data);
+
+                $sheet->prependRow(1, ["Taurus Inventory Report for $branch"]);
+                $sheet->mergeCells("A1:G1");
+                $sheet->cell('A1', function($cell) {
+                    // change header color
+                    $cell->setBackground('#3ed1f2')
+                        ->setFontColor('#0a0a0a')
+                        ->setFontWeight('bold')
+                        ->setAlignment('center')
+                        ->setValignment('center')
+                        ->setFontSize(13);;
+                });
+            });
+        })->download('xlsx');
+    }
 }

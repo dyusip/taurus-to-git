@@ -10,7 +10,7 @@ class Branch extends Model
     use SoftDeletes;
     //
     protected $fillable = [
-        'code', 'name', 'address', 'contact','status'
+        'code', 'name', 'address', 'contact','status','goal'
     ];
 
     protected $dates = ['delete_at'];
@@ -51,5 +51,13 @@ class Branch extends Model
     public function so_header_branch()
     {
         return $this->hasMany(SoHeader::class,'branch_code','code');
+    }
+    public function req_from_header_branch()
+    {
+        return $this->hasMany(ReqHeader::class,'req_from','code');
+    }
+    public function req_to_header_branch()
+    {
+        return $this->hasMany(ReqHeader::class,'req_to','code');
     }
 }

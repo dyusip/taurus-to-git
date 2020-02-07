@@ -423,11 +423,15 @@
                     addRow();
                     Choosen();
                     Validate();
-                    $("#order-tbl tr:last #product").append('<option value=""></option>');
-                    $.each(data, function (index, value) {
-                        $("#order-tbl tr:last #product").append("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
-                    });
                 }
+                var output = [];
+                //$("#order-tbl tr:last #product").append('<option value=""></option>');
+                output.push({id: '', text: ''});
+                $.each(data, function (index, value) {
+                    //$("#order-tbl tr:last #product").append("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
+                    output.push({id: value.inventory.code, text: value.inventory.name});
+                });
+                select_product(output);
             }
         });
     }
@@ -436,6 +440,8 @@
             "<td>" +
             "<input type='text' name='prod_code[]' id='code' class='form-control code' readonly>" +
             "<input type='hidden' name='prod_name[]' id='prod_name' class='form-control' readonly> " +
+            "<input type='hidden' name='prod_cost[]' id='prod_cost' class='form-control' readonly> " +
+            "<input type='hidden' name='prod_srp[]' id='prod_srp' class='form-control' readonly> " +
             "</td> " +
             "<td><select class='form-control select2_demo_1 product' required tabindex='2' name='product' id='product'> " +
             '</select></td> ' +
@@ -470,14 +476,22 @@
             success: function(data) {
                 //var data = jQuery.parseJSON(output);
                 $('#item-error').fadeOut();
-                var qty = tr.find('#qty').val();
+                if(Number(tr.find('#qty').val()) > Number(data.quantity)){
+                    tr.find('#amount').val(0);
+                    tr.find('#qty').val('');
+                }else{
+                    var qty = tr.find('#qty').val();
+                    var amount = qty * data.cost;
+                    tr.find('#amount').val(amount);
+                }
                 tr.find('#code').val(data.prod_code);
                 tr.find('#prod_name').val(data.inventory.name);
                 tr.find('#cost').val(data.cost);
                 tr.find('#uom').val(data.inventory.uom);
                 tr.find('#available').val(data.quantity);
-                var amount = qty * data.cost;
-                tr.find('#amount').val(amount);
+                tr.find('#prod_cost').val(data.cost);
+                tr.find('#prod_srp').val(data.price);
+
                 totalAmount();
                 $('#main-spinner').fadeOut();
 
@@ -512,18 +526,70 @@
         var l = $( '.ladda-button-demo' ).ladda();
         l.ladda( 'start' );
     });
-    $(function () {
+    /*$(function () {
         $('#datepicker').datepicker();
     });
     $('#reqDate').change(function () {
         ($(this).val() != "") ? $('#reqDate-error').hide() : $('#reqDate-error').show();
         ($(this).val() != "") ? $('#reqDate').removeClass('error') : $('#reqDate').addClass('error');
-    });
+    });*/
 
     @if (session('status'))
         $(document).ready(function () {
         toastr.success("{{ session('status') }}");
     });
     @endif
+
+    function select_product(data) {
+        items = data;
+
+            pageSize = 50;
+
+        $.fn.select2.amd.require(["select2/data/array", "select2/utils"],
+
+            function (ArrayData, Utils) {
+                function CustomData($element, options) {
+                    CustomData.__super__.constructor.call(this, $element, options);
+                }
+                Utils.Extend(CustomData, ArrayData);
+
+                CustomData.prototype.query = function (params, callback) {
+
+                    results = [];
+                    if (params.term && params.term !== '') {
+                        /*results = _.filter(items, function(e) {
+                            return e.text.toUpperCase().indexOf(params.term.toUpperCase()) >= 0;
+                        });*/
+                        keywords=(params.term).split(" ");
+                        results = _.filter(items, function(e) {
+                            for (var i = 0; i < keywords.length; i++) {
+                                if (((e.text).toUpperCase()).indexOf((keywords[i]).toUpperCase()) == -1)
+                                    return null;
+                            }
+                            return e;
+                        });
+                    } else {
+                        results = items;
+                    }
+
+                    if (!("page" in params)) {
+                        params.page = 1;
+                    }
+                    var data = {};
+                    data.results = results.slice((params.page - 1) * pageSize, params.page * pageSize);
+                    data.pagination = {};
+                    data.pagination.more = params.page * pageSize < results.length;
+                    callback(data);
+                };
+
+                $(document).ready(function () {
+                    $(".product").select2({
+                        ajax: {},
+                        dataAdapter: CustomData,
+                        width: '100%'
+                    });
+                });
+            });
+    }
 </script>
 @endpush

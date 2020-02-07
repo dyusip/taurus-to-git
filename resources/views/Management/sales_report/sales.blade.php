@@ -141,9 +141,9 @@
                                                     <td>{{ $story->sod_prod_code}}</td>
                                                     <td>{{ $story->sod_prod_name}}</td>
                                                     <td>{{ $story->sod_prod_qty}}</td>
-                                                    <td>{{ $story->sod_prod_price}}</td>
+                                                    <td>{!! Number_Format($story->sod_prod_price, 2) !!}</td>
                                                     <td>{{ $story->sod_less}}</td>
-                                                    <td>{{ $story->sod_prod_amount}}</td>
+                                                    <td>{!! Number_Format($story->sod_prod_amount,2) !!}</td>
                                                 </tr>
                                                 @php
                                                     $total += $story->sod_prod_amount;
@@ -162,7 +162,7 @@
                                             <td style="display: none;"></td>
                                             <td style="display: none;"></td>
                                             <th class="text-right" colspan="8">TOTAL AMOUNT</th>
-                                            <th>{{ @$total }}</th>
+                                            <th>{{  Number_Format(@$total,2) }}</th>
                                         </tr>
 
                                     </table>

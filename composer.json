@@ -11,6 +11,7 @@
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "maatwebsite/excel": "~2.1.0",
+        "nexmo/laravel": "^1.1",
         "patosmack/laravel-excel": "^1.1",
         "spatie/activitylog": "^2.4",
         "yajra/laravel-datatables-oracle": "~7.2"

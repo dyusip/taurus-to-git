@@ -189,7 +189,7 @@
 
                                             <div class="btn-group ">
                                                 {{--<a href="#add-prod-modal" data-toggle="modal" class="btn btn-success btn-sm"><i class="fa fa-plus-circle"></i> Add Item</a>--}}
-                                                <button type="submit" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-check-circle"></i> Create PO</button>
+                                                <button type="submit" class="btn btn-primary ladda-button ladda-button-demo btn-sm" data-style="zoom-in"><i class="fa fa-check-circle"></i> Create DR</button>
                                             </div>
 
                                         </div>
@@ -279,7 +279,22 @@
         }
     });
     function Choosen() {
-        $(".select2_demo_1").select2();
+        //(".select2_demo_1").select2();
+        $('.select2_demo_1').select2({
+            matcher: function (params, data) {
+                if ($.trim(params.term) === '') {
+                    return data;
+                }
+    
+                keywords=(params.term).split(" ");
+    
+                for (var i = 0; i < keywords.length; i++) {
+                    if (((data.text).toUpperCase()).indexOf((keywords[i]).toUpperCase()) == -1) 
+                    return null;
+                }
+                return data;
+            }
+        });
 
         var config = {
             '.chosen-select': {},
@@ -423,10 +438,14 @@
                     addRow();
                     Choosen();
                     Validate();
+                    var output = [];
                     $("#order-tbl tr:last #product").append('<option value=""></option>');
                     $.each(data, function (index, value) {
-                        $("#order-tbl tr:last #product").append("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
+                        //items.push({ id: value.inventory.code, text : value.inventory.name});
+                        //$("#order-tbl tr:last #product").append("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
+                        output.push("<option value='" + value.inventory.code + "'>" + value.inventory.name + "</option>");
                     });
+                    $("#order-tbl tr:last #product").append(output.join(''));
                 }
             }
         });
@@ -436,6 +455,8 @@
             "<td>" +
             "<input type='text' name='prod_code[]' id='code' class='form-control code' readonly>" +
             "<input type='hidden' name='prod_name[]' id='prod_name' class='form-control' readonly> " +
+            "<input type='hidden' name='prod_cost[]' id='prod_cost' class='form-control' readonly> " +
+            "<input type='hidden' name='prod_srp[]' id='prod_srp' class='form-control' readonly> " +
             "</td> " +
             "<td><select class='form-control select2_demo_1 product' required tabindex='2' name='product' id='product'> " +
             '</select></td> ' +
@@ -470,14 +491,22 @@
             success: function(data) {
                 //var data = jQuery.parseJSON(output);
                 $('#item-error').fadeOut();
-                var qty = tr.find('#qty').val();
+                if(Number(tr.find('#qty').val()) > Number(data.quantity)){
+                    tr.find('#amount').val(0);
+                    tr.find('#qty').val('');
+                }else{
+                    var qty = tr.find('#qty').val();
+                    var amount = qty * data.cost;
+                    tr.find('#amount').val(amount);
+                }
                 tr.find('#code').val(data.prod_code);
                 tr.find('#prod_name').val(data.inventory.name);
                 tr.find('#cost').val(data.cost);
                 tr.find('#uom').val(data.inventory.uom);
                 tr.find('#available').val(data.quantity);
-                var amount = qty * data.cost;
-                tr.find('#amount').val(amount);
+                tr.find('#prod_cost').val(data.cost);
+                tr.find('#prod_srp').val(data.price);
+
                 totalAmount();
                 $('#main-spinner').fadeOut();
 
@@ -512,13 +541,13 @@
         var l = $( '.ladda-button-demo' ).ladda();
         l.ladda( 'start' );
     });
-    $(function () {
+    /*$(function () {
         $('#datepicker').datepicker();
     });
     $('#reqDate').change(function () {
         ($(this).val() != "") ? $('#reqDate-error').hide() : $('#reqDate-error').show();
         ($(this).val() != "") ? $('#reqDate').removeClass('error') : $('#reqDate').addClass('error');
-    });
+    });*/
 
     @if (session('status'))
         $(document).ready(function () {

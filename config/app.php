@@ -173,6 +173,7 @@ return [
          * Package Service Providers...
          */
         Laravel\Tinker\TinkerServiceProvider::class,
+        Nexmo\Laravel\NexmoServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -235,6 +236,7 @@ return [
         'Fpdf' => Codedge\Fpdf\Facades\Fpdf::class, // [2]
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Activity' => Spatie\Activitylog\ActivitylogFacade::class,
+        'Nexmo' => Nexmo\Laravel\Facade\Nexmo::class,
 
     ],
 

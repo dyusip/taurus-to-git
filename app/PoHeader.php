@@ -9,17 +9,20 @@ class PoHeader extends Model
 {
     //
     protected $fillable = [
-        'po_code', 'po_prepby', 'req_date', 'term', 'po_date', 'sup_name', 'sup_add', 'sup_contact', 'status', 'total'
+        'po_code', 'po_prepby', 'req_date', 'term', 'po_date', 'sup_code', 'status', 'total'
     ];
 
     public function po_detail(){
         return $this->hasMany(PoDetail::class,'pod_code','po_code');
     }
+    public function po_re_header(){
+        return $this->hasMany(ReceivingHeader::class,'rh_po_no','po_code');
+    }
     public function setReqDateAttribute($value)
     {
         $this->attributes['req_date'] = Carbon::createFromFormat('m/d/Y', $value)->format('Y-m-d');
     }
-    public function setSupNameAttribute($value)
+    /*public function setSupNameAttribute($value)
     {
         $this->attributes['sup_name'] = strtoupper($value);
 
@@ -33,11 +36,10 @@ class PoHeader extends Model
     {
         $this->attributes['sup_contact'] = strtoupper($value);
 
-    }
+    }*/
     public function getPoDateAttribute($value)
     {
         return Carbon::createFromFormat('Y-m-d', $value)->format('m/d/Y');
-
     }
     public function getTotalAttribute($value)
     {
@@ -51,5 +53,9 @@ class PoHeader extends Model
     public function approved()
     {
         return $this->belongsTo(User::class,'po_appby','username');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class,'sup_code','code');
     }
 }

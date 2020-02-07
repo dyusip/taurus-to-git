@@ -42,8 +42,8 @@ class PO_PDF extends Controller
 
         $fpdf->SetFont('Arial', '', 9);
         $fpdf->SetWidths(array(95,25,35,35));
-        $fpdf->Row(array("Supplier Name: $po->sup_name","","Date","$po->po_date"));
-        $fpdf->Row(array("Contact No: $po->sup_contact","","Term","$po->term"));
+        $fpdf->Row(array("Supplier Name: {$po->supplier->name}","","Date","$po->po_date"));
+        $fpdf->Row(array("Contact No: {$po->supplier->contact}","","Term","$po->term"));
         $fpdf->Row(array("Fax No: ","","Reference",""));
         $fpdf->SetWidths(array(95,25,70));
         $fpdf->Row2(array("Contact Person: ","",""));
@@ -87,8 +87,10 @@ class PO_PDF extends Controller
         $fpdf->Cell(20, 5, "Prepared by: ","L",0);
         $fpdf->SetFont('Arial', 'U', 9);
         $fpdf->Cell(170, 5,$po->prepared->name ,"R",1);
-        $signature = public_path() . '/img/signature.png';
-        $fpdf->Cell(190,10,$fpdf->Image($signature, 150, $fpdf->GetY(),33.78),"LR",1,"R");
+        if($po->po_appby == 'henry'){
+            $signature = public_path() . '/img/signature.png';
+            $fpdf->Cell(190,10,$fpdf->Image($signature, 150, $fpdf->GetY(),33.78),"LR",1,"R");
+        }
        /* if($app_by=="HENRY C. POBLADOR"){
             $pdf->Cell(190,10,$pdf->Image('../../signature.png', 150, $pdf->GetY(),33.78),"LR",1,"R");
         }elseif($app_by=="ILY-J B. VELASCO"){

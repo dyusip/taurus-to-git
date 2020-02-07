@@ -2,9 +2,9 @@
 
 @section('index-content')
     <div id="wrapper">
-        @include('Management.sidebar')
+        @include('Purchasing.sidebar')
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Management.header')
+            @include('Purchasing.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>Taurus New Enteprise Block Box Report</h2>
@@ -176,11 +176,23 @@
                                                     {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
                                                 </tr>
                                                 <tr>
+                                                    <td>Positive Discount</td>
+                                                    <td>{!! Number_Format(@$sales_disc->pos_disc_perc,2) !!}%</td>
+                                                    <td>{!! Number_Format(@$sales_disc->pos_disc,2) !!}</td>
+                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                <tr>
+                                                    <td>Negative Discount</td>
+                                                    <td>{!! Number_Format(@$sales_disc->neg_disc_perc,2) !!}%</td>
+                                                    <td>{!! Number_Format(@$sales_disc->neg_disc,2) !!}</td>
+                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                {{--<tr>
                                                     <td>Discount</td>
                                                     <td>{!! Number_Format(@$sales_disc->total_so_disc_cost,2) !!}%</td>
                                                     <td>{!! Number_Format(@$sales_disc->total_so_disc_srp,2) !!}</td>
-                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
-                                                </tr>
+                                                    --}}{{-- <td>{{ $item->tf_to_branch->name }}</td>--}}{{--
+                                                </tr>--}}
                                                 <tr>
                                                     <td>Miscellaneous IN</td>
                                                     <td>{!! Number_Format(@$misc_in->misc_in_cost,2) !!}</td>

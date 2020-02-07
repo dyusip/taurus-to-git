@@ -61,6 +61,10 @@
                                                 <label>Contact #</label>
                                                 <input type="text" autocomplete="off" placeholder="Contact" value="{{ old('contact') }}" name="contact" id="contact" class="form-control">
                                             </div>
+                                            <div class="form-group">
+                                                <label>Goal</label>
+                                                <input type="text" autocomplete="off" placeholder="Goal" value="{{ old('goal') }}" name="goal" id="goal" class="form-control">
+                                            </div>
                                             <div>
                                                 <!--<button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Create Account</strong></button>-->
                                                 <button class="btn btn-sm btn-primary btn-block" name="register" type="submit"><strong id="register">Create Account</strong></button>
@@ -318,6 +322,7 @@
                 $('#name').val(data.name);
                 $('#address').val(data.address);
                 $('#contact').val(data.contact);
+                $('#goal').val(data.goal);
                 $('#form-branch').attr('action','/branch/'+data.id);
                 $('#_method').removeAttr('disabled');
                 $('#register').html('Update Account');

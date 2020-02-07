@@ -7,7 +7,7 @@
             @include('Management.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
-                    <h2>Taurus Purchase Report</h2>
+                    <h2>Taurus New Purchase Report</h2>
                     <ol class="breadcrumb">
                         <li>
                             <a href="dashboard.php">Home</a>
@@ -16,7 +16,7 @@
                             <a>Taurus</a>
                         </li>
                         <li class="active">
-                            <strong>Taurus Purchase Report</strong>
+                            <strong>Taurus New Purchase Report</strong>
                         </li>
                     </ol>
                 </div>
@@ -48,7 +48,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <form role="form" action="/purchase_report" method="post" name="myform" id="myform">
+                            <form role="form" action="/nr_purchase_report" method="post" name="myform" id="myform">
                                 <div class="ibox-content">
                                     {{ csrf_field() }}
                                     <p>Show report by</p>
@@ -100,7 +100,7 @@
                                     </div>--}}
                                 </div>
                                 <div class="ibox-content tooltip-demo">
-                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/purchase_report/print">
+                                    <button data-toggle="tooltip" title="Print"  class="btn btn-primary btn-sm dim" name="CEOprintForm" formaction="/nr_purchase_report/print">
                                         <span aria-hidden="true" class="fa fa-print fa-5x"></span>
                                     </button>
 

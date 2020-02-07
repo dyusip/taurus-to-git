@@ -2,9 +2,9 @@
 
 @section('index-content')
     <div id="wrapper">
-        @include('Management.sidebar')
+        @include('Purchasing.sidebar')
         <div id="page-wrapper" class="gray-bg dashbard-1">
-            @include('Management.header')
+            @include('Purchasing.header')
             <div class="row wrapper border-bottom white-bg page-heading">
                 <div class="col-lg-10">
                     <h2>Taurus Enteprise Block Box Report</h2>
@@ -158,6 +158,12 @@
                                                     {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
                                                 </tr>
                                                 <tr>
+                                                    <td>Sales Return</td>
+                                                    <td>{!! Number_Format(@$sales_return->total_so_return_cost,2) !!}</td>
+                                                    <td>{!! Number_Format(@$sales_return->total_so_return_srp,2) !!}</td>
+                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                <tr>
                                                     <td>Transfer out</td>
                                                     <td>{!! Number_Format(@$tf_out->total_tf_out_cost,2) !!}</td>
                                                     <td>{!! Number_Format(@$tf_out->total_tf_out_srp,2) !!}</td>
@@ -169,12 +175,24 @@
                                                     <td>{!! Number_Format(@$return->total_return_srp,2) !!}</td>
                                                     {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
                                                 </tr>
-                                                <tr>
-                                                    <td>Discount</td>
-                                                    <td>{!! Number_Format(@$sales_disc->total_so_disc_cost,2) !!}%</td>
-                                                    <td>{!! Number_Format(@$sales_disc->total_so_disc_srp,2) !!}</td>
-                                                    {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
-                                                </tr>
+                                            {{--<tr>
+                                                 <td>Discount</td>
+                                                 <td>{!! Number_Format(@$sales_disc->total_so_disc_cost,2) !!}%</td>
+                                                 <td>{!! Number_Format(@$sales_disc->total_so_disc_srp,2) !!}</td>
+                                                 --}}{{-- <td>{{ $item->tf_to_branch->name }}</td>--}}{{--
+                                             </tr>--}}
+                                            <tr>
+                                                <td>Positive Discount</td>
+                                                <td>{!! Number_Format(@$sales_disc->pos_disc_perc,2) !!}%</td>
+                                                <td>{!! Number_Format(@$sales_disc->pos_disc,2) !!}</td>
+                                                {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                            </tr>
+                                            <tr>
+                                                <td>Negative Discount</td>
+                                                <td>{!! Number_Format(@$sales_disc->neg_disc_perc,2) !!}%</td>
+                                                <td>{!! Number_Format(@$sales_disc->neg_disc,2) !!}</td>
+                                                {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                            </tr>
                                                 <tr>
                                                     <td>Miscellaneous IN</td>
                                                     <td>{!! Number_Format(@$misc_in->misc_in_cost,2) !!}</td>
@@ -186,6 +204,16 @@
                                                     <td>{!! Number_Format(@$misc_out->misc_out_cost,2) !!}</td>
                                                     <td>{!! Number_Format(@$misc_out->misc_out_srp,2) !!}</td>
                                                     {{-- <td>{{ $item->tf_to_branch->name }}</td>--}}
+                                                </tr>
+                                                <tr>
+                                                    <td>Positive Cost and SRP Adjustment</td>
+                                                    <td>{!! Number_Format(@$price_adj_1->pos_adj_cost1 + @$price_adj_2->pos_adj_cost2,2) !!}</td>
+                                                    <td>{!! Number_Format(@$price_adj_1->pos_adj_srp1 + @$price_adj_2->pos_adj_srp2,2) !!}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Negative Cost and SRP Adjustment</td>
+                                                    <td>{!! Number_Format(@$price_adj_1->neg_adj_cost1 + @$price_adj_2->neg_adj_cost2,2) !!}</td>
+                                                    <td>{!! Number_Format(@$price_adj_1->neg_adj_cost1 + @$price_adj_2->neg_adj_cost2,2) !!}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>End Inv</td>
@@ -253,6 +281,7 @@
         $('#tbl-transfer').DataTable({
             dom: '<"html5buttons"B>lTfgitp',
             "bSort" : false,
+            "pageLength": 25,
             buttons: [
                 /* {extend: 'copy'},
                  {extend: 'csv'},*/

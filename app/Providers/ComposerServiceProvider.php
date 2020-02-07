@@ -17,6 +17,9 @@ class ComposerServiceProvider extends ServiceProvider
     {
         //
         View::composer('Management.header','App\Http\ViewComposers\NotificationComposer');
+        View::composer('Management.sidebar','App\Http\ViewComposers\NotificationComposer');
+        View::composer('Partsman.header','App\Http\ViewComposers\NotificationComposer');
+        View::composer('Purchasing.header','App\Http\ViewComposers\NotificationComposer');
     }
 
     /**

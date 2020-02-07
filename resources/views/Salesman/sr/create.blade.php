@@ -76,9 +76,9 @@
                                             <div class="form-group"><label>SO #</label> <label id="company_code-error" class="error" for="so_code" style="display: none">This field is required.</label>
                                                 <select class="form-control select2_demo_1" name="so_code" id="so_code">
                                                     <option value=""></option>
-                                                    @foreach($sos as $so)
+                                                    {{--@foreach($sos as $so)
                                                         <option value="{{ $so->so_code }}">{{ $so->so_code." - ".$so->cust_name }}</option>
-                                                    @endforeach
+                                                    @endforeach--}}
                                                 </select>
                                             </div>
                                             <div class="form-group"><label>Customer Name</label> <input readonly type="text" style="text-transform: uppercase" id="cust_name" placeholder="Customer Name" class="form-control"></div>
@@ -214,6 +214,7 @@
 <script src="{{ asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
 <script>
     $(document).ready(function () {
+        select_product()
         Choosen();
         toastr.options = {
             "closeButton": true,
@@ -278,7 +279,10 @@
                     $('#totalAmount').val(data.header.total);
                     $.each(data.detail, function (index, value) {
                         var row = "<tr> " +
-                            "<td><input type='text' name='prod_code[]' value='" + value.sod_prod_code + "' id='code' class='form-control code' readonly></td> " +
+                            "<td><input type='text' name='prod_code[]' value='" + value.sod_prod_code + "' id='code' class='form-control code' readonly>" +
+                            "<input type='hidden' name='prod_cost[]' value='" + value.sod_prod_cost + "' id='prod_cost' class='form-control code' readonly>"+
+                            "<input type='hidden' name='prod_srp[]' value='" + value.sod_prod_srp + "' id='prod_srp' class='form-control code' readonly>"+
+                            "</td> " +
                             "<td><input type='text' name='prod_name[]' value='" + value.sod_prod_name + "' id='prod_name' class='form-control' readonly></td> " +
                             '<td><input type="text" name="uom[]" value="' + value.sod_prod_uom + '" id="uom" class="form-control" readonly></td> ' +
                             '<td><input type="hidden" id="order_qty" value="'+ value.sod_prod_qty +'"><input type="text" name="qty[]" value="' + value.sod_prod_qty + '" id="qty" class="form-control" required></td> ' +
@@ -348,5 +352,59 @@
         toastr.success("{{ session('status') }}");
     });
     @endif
+
+    function select_product() {
+        items = [];
+                @foreach($sos as $so)
+        var id = "{{ $so->so_code }}";
+        var item = "{{ $so->so_code ." - ". $so->jo_code}}";
+        items.push({id: id, text: item});
+        @endforeach
+            pageSize = 50;
+
+        $.fn.select2.amd.require(["select2/data/array", "select2/utils"],
+
+            function (ArrayData, Utils) {
+                function CustomData($element, options) {
+                    CustomData.__super__.constructor.call(this, $element, options);
+                }
+                Utils.Extend(CustomData, ArrayData);
+
+                CustomData.prototype.query = function (params, callback) {
+
+                    results = [];
+                    if (params.term && params.term !== '') {
+                        results = _.filter(items, function(e) {
+                            return e.text.toUpperCase().indexOf(params.term.toUpperCase()) >= 0;
+                        });
+                    } else {
+                        results = items;
+                    }
+
+                    if (!("page" in params)) {
+                        params.page = 1;
+                    }
+                    var data = {};
+                    data.results = results.slice((params.page - 1) * pageSize, params.page * pageSize);
+                    data.pagination = {};
+                    data.pagination.more = params.page * pageSize < results.length;
+                    callback(data);
+                };
+
+                /* function callMe() {
+                 return $('#table-id tr:last');
+                 }*/
+                $(document).ready(function () {
+                    $(".select2_demo_1").select2({
+                        ajax: {},
+                        dataAdapter: CustomData,
+                        width: '100%'
+                    });
+                    //}).append(data).trigger('change');
+                });
+            });
+
+        //});
+    }
 </script>
 @endpush

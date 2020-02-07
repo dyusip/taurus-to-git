@@ -71,9 +71,17 @@
                             <div class="ibox-content">
                                 <div class="row">
                                     <div class="col-sm-7 b-r">
-                                        <div class="form-group"><label>Supplier Name</label> <input type="text" required style="text-transform: uppercase" name="sup_name" id="sup_name" placeholder="Supplier Name" class="form-control"></div>
-                                        <div class="form-group"><label>Address</label> <input type="text" name="sup_add" style="text-transform: uppercase" id="sup_add" placeholder="Address" class="form-control"></div>
-                                        <div class="form-group"><label>Contact #</label> <input type="text" name="sup_contact" style="text-transform: uppercase" id="sup_contact" placeholder="Contact #" class="form-control"></div>
+                                        <div class="form-group"><label for="sup_code">Supplier Name</label>
+                                            {{--<input type="text" required style="text-transform: uppercase" name="sup_name" id="sup_name" placeholder="Supplier Name" class="form-control">--}}
+                                            <select class="form-control select2_demo_1" name="sup_code" id="sup_code">
+                                                <option value=""></option>
+                                                @foreach($suppliers as $supplier)
+                                                    <option value="{{ $supplier->code }}">{{ $supplier->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="form-group"><label>Address</label> <input type="text" id="address"  readonly style="text-transform: uppercase"  placeholder="Address" class="form-control"></div>
+                                        <div class="form-group"><label>Contact #</label> <input type="text" id="sup_contact" readonly style="text-transform: uppercase"  placeholder="Contact #" class="form-control"></div>
                                         <!--<div>
                                                <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit"><strong>Log in</strong></button>
                                                <label> <input type="checkbox" class="i-checks"> Remember me </label>
@@ -190,6 +198,8 @@
                                             <td>
                                                 <input type="text" required name="prod_code[]" id="code" class="form-control code" readonly>
                                                 <input type="hidden" required name="prod_name[]" id="prod_name" class="form-control" readonly>
+                                                <input type="hidden" required name="prod_cost[]" id="prod_cost" class="form-control" readonly>
+                                                <input type="hidden" required name="prod_srp[]" id="prod_srp" class="form-control" readonly>
                                             </td>
                                             <td><select class="form-control select2_demo_1" required tabindex="2" name="product" id="product">
                                                     <option></option>
@@ -199,7 +209,7 @@
                                                 </select></td>
                                             <td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td>
                                             <td><input type="text" name="qty[]" id="qty" required class="form-control qty" ></td>
-                                            <td><input type="text" name="cost[]" id="cost" class="form-control" readonly></td>
+                                            <td><input type="text" name="cost[]" id="cost" required class="form-control"></td>
                                             <td><select name="less[]" id="less" class="form-control">
                                                     @for ($i = 0; $i < 31; $i++)
                                                         <option value="{{ $i }}">{{$i}}%</option>
@@ -294,7 +304,7 @@
 <script src="{{ asset('js/plugins/select2/select2.full.min.js') }}"></script>
 <script src="{{ asset('/js/plugins/dataTables/datatables.min.js') }}"></script>
 <script src="{{ asset('js/plugins/datapicker/bootstrap-datepicker.js') }}"></script>
-{{--<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>--}}
+<script src="{{ asset('js/plugins/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('js/plugins/ladda/spin.min.js') }}"></script>
 <script src="{{ asset('js/plugins/ladda/ladda.min.js') }}"></script>
 <script src="{{ asset('js/plugins/ladda/ladda.jquery.min.js') }}"></script>
@@ -320,7 +330,22 @@
         }
     });
     function Choosen() {
-        $(".select2_demo_1").select2();
+        //$(".select2_demo_1").select2();
+        $('.select2_demo_1').select2({
+            matcher: function (params, data) {
+                if ($.trim(params.term) === '') {
+                    return data;
+                }
+    
+                keywords=(params.term).split(" ");
+    
+                for (var i = 0; i < keywords.length; i++) {
+                    if (((data.text).toUpperCase()).indexOf((keywords[i]).toUpperCase()) == -1) 
+                    return null;
+                }
+                return data;
+            }
+        });
 
         var config = {
             '.chosen-select': {},
@@ -367,6 +392,7 @@
     });
     function Validate() {
         $('[id^=qty]').keypress(validateNumber);
+        $('[id^=cost]').keypress(validateNumber);
     }
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
@@ -414,6 +440,30 @@
                 }
             });
         });*/
+        $(document).on('change','#sup_code',function () {
+           var sup = $(this).val();
+           if(sup == ""){
+               $('#address').val('');
+               $('#sup_contact').val('');
+           }else {
+               $.ajax({
+                   url: "sup/" + sup,
+                   beforeSend: function () {
+                       $('#main-spinner').fadeIn();
+                   },
+                   success: function (data) {
+                       //var data = jQuery.parseJSON(output);
+                       $('#address').val(data.address);
+                       $('#sup_contact').val(data.contact);
+                       $('#main-spinner').fadeOut();
+
+                   },
+                   error: function (xhr, ajaxOptions, thrownError) {
+                       alert(xhr.status + " " + thrownError);
+                   }
+               });
+           }
+        });
         $('tbody').delegate('#product','change',function () {
             var tr = $(this).parent().parent();
             var item = $(this).val();
@@ -448,6 +498,8 @@
                     tr.find('#uom').val(data.inventory.uom);
                     var amount = (data.cost * qty - ((data.cost * qty) * less/100)) ;
                     tr.find('#amount').val(amount);
+                    tr.find('#prod_cost').val(data.cost);
+                    tr.find('#prod_srp').val(data.price);
 
                     totalAmount();
                     $('#main-spinner').fadeOut();
@@ -463,6 +515,15 @@
             var qty = $(this).val();
             var less = tr.find('#less').val();
             var price = tr.find('#cost').val();
+            var amount = (price * qty - ((price * qty) * less/100)) ;
+            tr.find('#amount').val(amount);
+            totalAmount();
+        });
+        $('tbody').delegate('#cost','keyup',function () {
+            var tr = $(this).parent().parent();
+            var price = $(this).val();
+            var less = tr.find('#less').val();
+            var qty = tr.find('#qty').val();
             var amount = (price * qty - ((price * qty) * less/100)) ;
             tr.find('#amount').val(amount);
             totalAmount();
@@ -515,6 +576,8 @@
                     "<td>" +
                     "<input type='text' name='prod_code[]' id='code' class='form-control code' readonly>" +
                     "<input type='hidden' name='prod_name[]' id='prod_name' class='form-control' readonly> " +
+                    "<input type='hidden' name='prod_cost[]' id='prod_cost' class='form-control' readonly> " +
+                    "<input type='hidden' name='prod_srp[]' id='prod_srp' class='form-control' readonly> " +
                     "</td> " +
                 "<td><select class='form-control select2_demo_1' required tabindex='2' name='product' id='product'> " +
                 "<option></option>"+
@@ -524,7 +587,7 @@
                         '</select></td> ' +
                         '<td><input type="text" name="uom[]" id="uom" class="form-control" readonly></td> ' +
                         '<td><input type="text" name="qty[]" required id="qty" class="form-control qty" ></td> ' +
-                        '<td><input type="text" name="cost[]" id="cost" class="form-control" readonly></td> ' +
+                        '<td><input type="text" name="cost[]" required id="cost" class="form-control"></td> ' +
                         '<td><select name="less[]" id="less" class="form-control">'+
                         '@for ($i = 0; $i < 31; $i++)'+
                         '<option value="{{ $i }}">{{$i}}%</option>'+

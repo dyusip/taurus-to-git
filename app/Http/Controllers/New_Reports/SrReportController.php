@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\SrReport;
+namespace App\Http\Controllers\New_Reports;
 
 use App\Branch;
 use App\SoHeader;
@@ -31,7 +31,7 @@ class SrReportController extends Controller
     {
         $branches = Branch::where(['status'=>'AC'])->get();
 
-        return view($this->position().'.salesreturn_report.salesreturn',compact('branches'));
+        return view($this->position().'.new_reports.salesreturn',compact('branches'));
     }
     public function show(Request $request)
     {
@@ -45,7 +45,7 @@ class SrReportController extends Controller
             })->get();
         }
         $branches = Branch::where(['status'=>'AC'])->get();
-        return view($this->position().'.salesreturn_report.salesreturn',compact('sales','request', 'branches'));
+        return view($this->position().'.new_reports.salesreturn',compact('sales','request', 'branches'));
     }
     public function print_report(Request $request)
     {
@@ -54,10 +54,12 @@ class SrReportController extends Controller
         $to = Carbon::createFromFormat('m/d/Y', $request->end)->format('Y-m-d');
         if($request->optCustType == "all"){
             $sales = SrHeader::whereBetween('sr_date', [$from, $to])->get();
+            $br = "ALL BRANCH";
         }elseif($request->optCustType == "branch"){
             $sales = SrHeader::whereBetween('sr_date', [$from, $to])->whereHas('sr_so_header', function ($query) use ($request) {
                 $query->where(['branch_code' => $request->branch]);
             })->get();
+            $br = Branch::where(['code' => @$request->branch])->first()->name." BRANCH";
         }
         $data = array();
         $total =  0;
@@ -71,23 +73,31 @@ class SrReportController extends Controller
                     'SO DATE' => $sale->so_date,
                     'ITEM CODE' => $story->srd_prod_code,
                     'NAME' => $story->srd_prod_name,
+                    'COST' => $story->srd_prod_cost,
+                    'SRP' => $story->srd_prod_srp,
                     'QTY' => $story->srd_prod_qty,
-                    'PRICE' => $story->srd_prod_price,
+                    'SALES RETURN PRICE' => $story->srd_prod_price,
                     'LESS' => $story->srd_less,
-                    'AMOUNT' => $story->srd_prod_amount,
+                    'TOTAL SALES RETURN' => $story->srd_prod_amount,
                 ];
                 $total += $story->srd_prod_amount;
             }
         }
 
-        return Excel::create('Taurus Sales-Return Report', function($excel) use ($data, $total) {
+        return Excel::create('Taurus Sales-Return Report', function($excel) use ($data, $total, $br , $from, $to) {
             $excel->setTitle('Taurus Sales-Return Report');
-            $excel->sheet('Sales-Return', function($sheet) use ($data, $total)
+            $excel->sheet('Sales-Return', function($sheet) use ($data, $total, $br , $from, $to)
             {
+                $sheet->setColumnFormat(array(
+                    'H' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'I' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'K' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'M' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                ));
                 $sheet->fromArray($data);
 
-                $sheet->prependRow(1, ["Taurus Sales-Return"]);
-                $sheet->mergeCells("A1:K1");
+                $sheet->prependRow(1, ["Taurus Sales-Return $br $from - $to"]);
+                $sheet->mergeCells("A1:M1");
                 $sheet->cell('A1', function($cell) {
                     // change header color
                     $cell->setBackground('#3ed1f2')
@@ -101,7 +111,7 @@ class SrReportController extends Controller
                 $sheet->appendRow("$footerRow",[
                     'Total Amount: '.$total
                 ]);
-                $sheet->mergeCells("A{$footerRow}:K{$footerRow}");
+                $sheet->mergeCells("A{$footerRow}:M{$footerRow}");
                 $sheet->cell("A{$footerRow}", function($cell) {
                     $cell->setBackground('#3ed1f2')
                         ->setAlignment('right')

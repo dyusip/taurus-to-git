@@ -36,7 +36,9 @@ class PurchaseReportController extends Controller
     {
         $from = Carbon::createFromFormat('m/d/Y', $request->start)->format('Y-m-d');
         $to = Carbon::createFromFormat('m/d/Y', $request->end)->format('Y-m-d');
-        $items = PoHeader::whereBetween('po_date', [$from, $to])->get();
+        $items = PoHeader::whereBetween('po_date', [$from, $to])->where(function($query)  {
+            $query->where('status','=','AP')->orWhere('status','=','CL');
+        })->get();
         $branches = Branch::where(['status'=>'AC'])->get();
         return view($this->position().'.purchase_report.purchase',compact('items','request', 'branches'));
     }
@@ -44,7 +46,9 @@ class PurchaseReportController extends Controller
     {
         $from = Carbon::createFromFormat('m/d/Y', $request->start)->format('Y-m-d');
         $to = Carbon::createFromFormat('m/d/Y', $request->end)->format('Y-m-d');
-        $items = PoHeader::whereBetween('po_date', [$from, $to])->get();
+        $items = PoHeader::whereBetween('po_date', [$from, $to])->where(function($query)  {
+            $query->where('status','=','AP')->orWhere('status','=','CL');
+        })->get();
         $data = array();
         $total =  0;
         foreach($items as $item){
@@ -55,7 +59,7 @@ class PurchaseReportController extends Controller
                     'ITEM CODE' => $story->prod_code,
                     'NAME' => $story->prod_name,
                     'QTY' => $story->prod_qty,
-                    'PRICE' => Number_Format($story->prod_price,2),
+                    'PRICE' => $story->prod_price,
                     'LESS' => $story->prod_less."%",
                     'AMOUNT' => $story->prod_amount,
                 ];
@@ -66,6 +70,11 @@ class PurchaseReportController extends Controller
         return Excel::create('Taurus Purchase Report', function($excel) use ($data, $total) {
             $excel->sheet('Purchase Report', function($sheet) use ($data, $total)
             {
+                $sheet->setColumnFormat(array(
+                    'F' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                    'H' => \PHPExcel_Style_NumberFormat::FORMAT_CURRENCY_PHP_SIMPLE,
+                ));
+
                 $sheet->fromArray($data);
 
                 $sheet->prependRow(1, ["Taurus Purchase Report "]);
@@ -79,9 +88,10 @@ class PurchaseReportController extends Controller
                         ->setValignment('center')
                         ->setFontSize(13);;
                 });
+
                 $footerRow = count($data) + 3;
                 $sheet->appendRow("$footerRow",[
-                    'Total Amount: '.Number_Format($total,2)
+                    'Total Amount: ₱'.Number_Format($total,2)
                 ]);
                 $sheet->mergeCells("A{$footerRow}:H{$footerRow}");
                 $sheet->cell("A{$footerRow}", function($cell) {
@@ -92,6 +102,7 @@ class PurchaseReportController extends Controller
                         //->setFontColor('#666666')
                         ->setFontSize(11);
                 });
+
             });
         })->download('xlsx');
     }
